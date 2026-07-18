@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JadwalKelas — SMAS Yayasan Pupuk Kaltim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0b1030;
+    --navy-2:#171c47;
+    --panel:#ffffff;
+    --ink:#1a1d2e;
+    --muted:#6b7089;
+    --faint:#a3a7bd;
+    --line:#eceefb;
+    --blue:#3b6df0;
+    --blue-dark:#1e3fae;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(1200px 700px at 10% 8%, rgba(80,100,220,.35), transparent 60%),
+      radial-gradient(900px 600px at 95% 90%, rgba(60,80,200,.30), transparent 55%),
+      linear-gradient(160deg,#0b1030 0%,#141a3e 55%,#1a2050 100%);
+    font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+    color:var(--ink);
+    padding:40px 20px;
+    position:relative;
+    overflow-x:hidden;
+  }
+
+  /* decorative floating shapes */
+  .deco{position:fixed;pointer-events:none;z-index:0;}
+  .deco.d1{width:340px;height:340px;left:-90px;top:60px;background:linear-gradient(135deg,rgba(90,120,240,.35),rgba(90,120,240,0));border-radius:40px;transform:rotate(28deg);filter:blur(2px);animation:floatA 22s ease-in-out infinite;}
+  .deco.d2{width:220px;height:220px;right:6%;top:8%;border:1px solid rgba(255,255,255,.10);border-radius:32px;transform:rotate(20deg);animation:floatB 26s ease-in-out infinite;}
+  .deco.d3{width:26px;height:26px;right:6%;bottom:6%;border:2px solid rgba(255,255,255,.55);transform:rotate(45deg);animation:floatC 14s ease-in-out infinite;}
+  .deco.d4{width:140px;height:140px;left:8%;bottom:10%;background:linear-gradient(135deg,rgba(120,90,240,.30),rgba(120,90,240,0));border-radius:28px;transform:rotate(-18deg);animation:floatD 30s ease-in-out infinite;}
+
+  @keyframes floatA{
+    0%,100%{transform:rotate(28deg) translate(0,0);}
+    50%{transform:rotate(34deg) translate(30px,40px);}
+  }
+  @keyframes floatB{
+    0%,100%{transform:rotate(20deg) translate(0,0);}
+    50%{transform:rotate(12deg) translate(-24px,26px);}
+  }
+  @keyframes floatC{
+    0%,100%{transform:rotate(45deg) translate(0,0);}
+    50%{transform:rotate(58deg) translate(-14px,-18px);}
+  }
+  @keyframes floatD{
+    0%,100%{transform:rotate(-18deg) translate(0,0);}
+    50%{transform:rotate(-24deg) translate(22px,-30px);}
+  }
+
+  .app-shell{
+    position:relative;z-index:1;
+    max-width:1240px;margin:0 auto;
+    background:var(--panel);
+    border-radius:26px;
+    box-shadow:0 40px 90px rgba(5,8,30,.45);
+    overflow:hidden;
+    animation:shellIn .5s ease both;
+  }
+  @keyframes shellIn{from{opacity:0;transform:translateY(18px) scale(.985);}to{opacity:1;transform:none;}}
+
+  /* TOPBAR */
+  .topbar{
+    display:flex;align-items:center;gap:20px;
+    padding:20px 28px;border-bottom:1px solid var(--line);
+    flex-wrap:wrap;
+  }
+  .logo{font-size:20px;font-weight:800;letter-spacing:-0.02em;color:var(--ink);white-space:nowrap;}
+  .logo span{color:var(--blue);}
+  .search{
+    flex:1;min-width:180px;
+    display:flex;align-items:center;gap:8px;
+    background:#f4f5fb;border-radius:12px;padding:10px 14px;
+    color:var(--faint);font-size:13px;
+  }
+  .search input{
+    border:none;background:none;outline:none;flex:1;
+    font-family:inherit;font-size:13px;color:var(--ink);
+  }
+  .search svg{flex-shrink:0;}
+  .topbar-right{display:flex;align-items:center;gap:14px;}
+  .icon-btn{
+    width:36px;height:36px;border-radius:10px;background:#f4f5fb;
+    display:flex;align-items:center;justify-content:center;
+    border:none;cursor:pointer;color:var(--muted);
+    transition:background .15s ease;
+  }
+  .icon-btn:hover{background:#e9ebfa;}
+  .avatar-circle{
+    width:38px;height:38px;border-radius:50%;
+    background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+    color:#fff;font-weight:700;font-size:13px;
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .2s ease;
+  }
+
+  /* SIDE NAV */
+  .side-nav{margin-bottom:20px;}
+  .side-nav-item{
+    display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    border:none;background:none;cursor:pointer;font-family:inherit;
+    font-size:13.5px;font-weight:600;color:var(--muted);
+    padding:9px 8px;border-radius:9px;margin-bottom:2px;
+    transition:background .15s ease, color .15s ease;
+  }
+  .side-nav-item svg{flex-shrink:0;}
+  .side-nav-item:hover{background:#f4f5fb;color:var(--ink);}
+  .side-nav-item.active{background:#eef2ff;color:var(--blue);}
+  .nav-badge{
+    margin-left:auto;background:#eceefb;color:var(--blue);
+    font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;
+  }
+  .side-divider{height:1px;background:var(--line);margin:8px 4px;}
+
+  .mini-search{
+    width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;
+    font-family:inherit;font-size:12.5px;color:var(--ink);margin-bottom:12px;outline:none;
+  }
+  .mini-search:focus{border-color:var(--blue);}
+  .guru-list{max-height:420px;overflow-y:auto;}
+  .guru-item{
+    padding:9px 4px;border-bottom:1px solid var(--line);
+    opacity:0;transform:translateY(-12px);
+    animation:guruItemIn .45s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  @keyframes guruItemIn{to{opacity:1;transform:translateY(0);}}
+  .guru-item .name{font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:3px;}
+  .guru-item .subjects{display:flex;flex-wrap:wrap;gap:4px;}
+  .guru-item .subj-badge{font-size:10px;font-weight:700;background:#f4f5fb;color:var(--muted);padding:2px 7px;border-radius:20px;}
+
+  .setting-row{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:10px 4px;border-bottom:1px solid var(--line);
+    font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;
+  }
+  .setting-row input{width:16px;height:16px;accent-color:var(--blue);cursor:pointer;}
+
+  .panel-head{
+    display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
+  }
+  .panel-close{
+    width:26px;height:26px;border-radius:8px;border:1px solid var(--line);
+    background:#fff;color:var(--muted);cursor:pointer;font-size:13px;line-height:1;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .panel-close:hover{background:var(--blue);border-color:var(--blue);color:#fff;}
+
+  @keyframes panelIn{
+    from{opacity:0;transform:translateY(-16px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+  .side-panel.panel-enter{animation:panelIn 1s cubic-bezier(.22,1,.36,1) both;}
+
+  /* TABS */
+  .tabbar{display:flex;gap:6px;padding:0 28px;border-bottom:1px solid var(--line);}
+  .tab{
+    border:none;background:none;cursor:pointer;
+    font-family:inherit;font-size:13.5px;font-weight:600;color:var(--muted);
+    padding:14px 6px;margin-right:22px;position:relative;
+    transition:color .15s ease;
+  }
+  .tab svg{margin-right:6px;vertical-align:-3px;}
+  .tab.active{color:var(--blue);}
+  .tab.active::after{
+    content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--blue);border-radius:2px;
+  }
+
+  /* BODY LAYOUT */
+  .body-row{display:flex;gap:0;align-items:flex-start;}
+  .sidebar{
+    width:230px;flex-shrink:0;padding:22px 20px;border-right:1px solid var(--line);
+  }
+  .sidebar h3{font-size:12px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px;}
+  .tier-block{margin-bottom:18px;}
+  .tier-toggle{
+    display:flex;gap:6px;background:#f4f5fb;border-radius:12px;padding:4px;margin-bottom:14px;
+  }
+  .tier-btn{
+    flex:1;border:none;background:none;cursor:pointer;padding:8px 0;border-radius:9px;
+    font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);
+    transition:background .15s ease, color .15s ease;
+  }
+  .tier-btn.active{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(20,20,50,.12);}
+  .class-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .class-btn{
+    border:1px solid var(--line);background:#fff;border-radius:10px;
+    padding:9px 0;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--ink);
+    transition:all .15s ease;
+  }
+  .class-btn:hover{border-color:var(--blue);}
+  .class-btn.selected{background:var(--blue);border-color:var(--blue);color:#fff;}
+  .sidebar .quick{margin-top:26px;}
+  .quick-link{
+    display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted);
+    padding:9px 0;cursor:pointer;font-weight:500;transition:color .15s ease;
+    border:none;background:none;font-family:inherit;width:100%;text-align:left;
+  }
+  .quick-link:hover{color:var(--blue);}
+
+  /* MAIN GRID */
+  .main{flex:1;padding:22px 26px;min-width:0;}
+  .main-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+  .main-head h2{font-size:16px;font-weight:700;margin:0;}
+  .main-head .sub{font-size:12.5px;color:var(--faint);margin-top:2px;}
+  .week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+  .day-col-head{
+    font-size:15px;font-weight:800;color:var(--ink);text-align:center;
+    letter-spacing:.01em;
+    padding-bottom:12px;border-bottom:2px solid var(--line);margin-bottom:10px;
+    position:relative;
+  }
+  .day-col-wrap{border-radius:14px;}
+  .day-col-wrap.today{
+    background:linear-gradient(180deg, rgba(59,109,240,.07), rgba(59,109,240,0) 90px);
+    margin:-8px;padding:8px;
+  }
+  .day-col-head.today{color:var(--blue);}
+  .day-col-head.today::after{
+    content:'Hari ini';
+    display:block;font-size:9.5px;font-weight:700;color:#fff;
+    background:var(--blue);border-radius:20px;padding:2px 8px;
+    margin:5px auto 0;width:fit-content;letter-spacing:.02em;
+  }
+  .day-col{display:flex;flex-direction:column;gap:8px;}
+  .card{
+    border-radius:12px;padding:9px 10px;
+    font-size:11.5px;line-height:1.35;
+    opacity:0;transform:scale(.82) translateY(16px);
+    transition:opacity .5s cubic-bezier(.34,1.56,.64,1), transform .5s cubic-bezier(.34,1.56,.64,1);
+    will-change:transform,opacity;
+  }
+  .card.in-view{opacity:1;transform:scale(1) translateY(0);}
+  .card:hover{transform:translateY(-2px) scale(1.02);}
+  .card.in-view:hover{transform:translateY(-2px) scale(1.02);}
+  .card .time{font-size:10.5px;font-weight:700;opacity:.85;margin-bottom:2px;}
+  .card .subj{font-weight:800;margin-bottom:1px;}
+  .card .who{font-size:10.5px;font-weight:600;opacity:.9;}
+  .card.dim{opacity:.25 !important;}
+  .card.brk{background:#f2f3f8;color:var(--muted);text-align:center;font-weight:600;border:1px dashed #d9dbee;}
+
+  .week-grid.hide-breaks .card.brk{display:none;}
+  .week-grid.hide-codes .code-tag{display:none;}
+
+  .empty-state{
+    padding:70px 20px;text-align:center;color:var(--faint);font-size:14px;font-weight:500;
+  }
+
+  /* LEGEND VIEW */
+  .legend-view{display:none;padding:6px 2px 20px;}
+  .legend-view.show{display:block;}
+  .legend-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .legend-table th{text-align:left;font-size:11.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--line);}
+  .legend-table td{padding:10px;border-bottom:1px solid var(--line);}
+  .legend-code{display:inline-block;font-weight:700;background:#f4f5fb;border-radius:7px;padding:3px 8px;font-size:11.5px;}
+
+  /* RIGHT PANEL */
+  .rightpanel{width:230px;flex-shrink:0;padding:22px 20px;border-left:1px solid var(--line);}
+  .rightpanel h3{font-size:12px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px;}
+  .info-card{background:#f4f5fb;border-radius:14px;padding:14px;margin-bottom:20px;}
+  .info-card .k{font-size:11.5px;color:var(--faint);margin-bottom:4px;}
+  .info-card .v{font-size:15px;font-weight:700;margin-bottom:10px;}
+  .info-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);padding:4px 0;}
+  .quick-btn{
+    display:flex;align-items:center;gap:9px;width:100%;text-align:left;
+    border:1px solid var(--line);background:#fff;border-radius:10px;
+    padding:10px 12px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--ink);
+    cursor:pointer;margin-bottom:8px;transition:border-color .15s ease, background .15s ease;
+  }
+  .quick-btn:hover{border-color:var(--blue);background:#f7f9ff;}
+  .quick-btn.primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+  .quick-btn.primary:hover{background:var(--blue-dark);}
+
+  footer.note{padding:16px 28px 26px;font-size:11.5px;color:var(--faint);line-height:1.55;border-top:1px solid var(--line);}
+
+  @media (max-width:980px){
+    .body-row{flex-direction:column;}
+    .sidebar{
+      width:100%;border-right:none;border-bottom:1px solid var(--line);
+      order:-1;
+    }
+    .class-grid{grid-template-columns:repeat(8,1fr);}
+    .rightpanel{display:none;}
+    .week-grid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width:560px){
+    .week-grid{grid-template-columns:1fr;}
+    .topbar{padding:16px;}
+    .class-grid{grid-template-columns:repeat(4,1fr);}
+  }
+
+  @media print{
+    body{background:#fff;padding:0;}
+    .deco,.topbar,.tabbar,.sidebar,.rightpanel,footer.note{display:none !important;}
+    .app-shell{box-shadow:none;border-radius:0;}
+    .card{animation:none;opacity:1;transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="deco d1"></div>
+<div class="deco d2"></div>
+<div class="deco d3"></div>
+<div class="deco d4"></div>
+
+<div class="app-shell">
+
+  <div class="topbar">
+    <div class="logo">Jadwal<span>Kelas</span></div>
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="searchBox" type="text" placeholder="Cari mata pelajaran atau nama guru…">
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn" title="Cetak jadwal" onclick="window.print()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="tabbar">
+    <button class="tab active" id="tabSchedule" onclick="switchTab('schedule')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Jadwal Mingguan
+    </button>
+    <button class="tab" id="tabLegend" onclick="switchTab('legend')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Legenda Kode
+    </button>
+  </div>
+
+  <div class="body-row">
+    <div class="sidebar">
+      <div class="side-nav">
+        <button class="side-nav-item active" data-panel="kelas" onclick="switchSidePanel('kelas')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Jadwal Kelas
+        </button>
+        <div class="side-divider"></div>
+        <button class="side-nav-item" data-panel="guru" onclick="switchSidePanel('guru')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Guru
+          <span class="nav-badge">51</span>
+        </button>
+        <button class="side-nav-item" data-panel="settings" onclick="switchSidePanel('settings')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.7.36 1.51.7 1.51 1.51V12"/></svg>
+          Settings
+        </button>
+      </div>
+
+      <div class="side-panel" id="sidePanel-kelas">
+        <h3>Pilih Kelas</h3>
+        <div class="tier-block">
+          <div class="tier-toggle" id="tierToggle"></div>
+          <div class="class-grid" id="classGrid"></div>
+        </div>
+        <div class="quick">
+          <h3>Aksi Cepat</h3>
+          <button class="quick-link" onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
+          <button class="quick-link" onclick="switchTab('legend')">📖 Lihat Legenda Kode</button>
+        </div>
+      </div>
+
+      <div class="side-panel" id="sidePanel-guru" style="display:none;">
+        <div class="panel-head">
+          <h3 style="margin:0;">Daftar Guru</h3>
+          <button class="panel-close" onclick="switchSidePanel('kelas')" title="Tutup">✕</button>
+        </div>
+        <input id="guruSearch" class="mini-search" type="text" placeholder="Cari nama guru…" oninput="renderGuruList()">
+        <div id="guruList" class="guru-list"></div>
+      </div>
+
+      <div class="side-panel" id="sidePanel-settings" style="display:none;">
+        <div class="panel-head">
+          <h3 style="margin:0;">Tampilan Jadwal</h3>
+          <button class="panel-close" onclick="switchSidePanel('kelas')" title="Tutup">✕</button>
+        </div>
+        <label class="setting-row">
+          <span>Sembunyikan istirahat/isoma</span>
+          <input type="checkbox" id="toggleHideBreaks" onchange="applySettings()">
+        </label>
+        <label class="setting-row">
+          <span>Tampilkan kode mapel</span>
+          <input type="checkbox" id="toggleShowCodes" checked onchange="applySettings()">
+        </label>
+        <div class="quick">
+          <h3>Lainnya</h3>
+          <button class="quick-link" onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
+          <button class="quick-link" onclick="switchTab('legend')">📖 Lihat Legenda Kode</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div id="scheduleView">
+        <div class="main-head">
+          <div>
+            <h2>Jadwal Mingguan</h2>
+            <div class="sub">Semester 1 · Tahun Ajaran 2026/2027</div>
+          </div>
+        </div>
+        <div id="weekGrid" class="week-grid" style="display:none;"></div>
+        <div id="emptyState" class="empty-state">Pilih kelas di panel kiri untuk menampilkan jadwal.</div>
+      </div>
+
+      <div id="legendView" class="legend-view">
+        <div class="main-head"><h2>Legenda Kode Mata Pelajaran</h2></div>
+        <table class="legend-table">
+          <thead><tr><th>Kode</th><th>Mata Pelajaran</th></tr></thead>
+          <tbody id="legendBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="rightpanel">
+      <h3>Info Kelas</h3>
+      <div class="info-card">
+        <div class="k">Kelas terpilih</div>
+        <div class="v" id="panelClassName">—</div>
+        <div class="info-row"><span>Total sesi/minggu</span><span id="infoSessions">–</span></div>
+        <div class="info-row"><span>Hari sekolah</span><span>5 hari</span></div>
+      </div>
+      <h3>Aksi</h3>
+      <button class="quick-btn primary" onclick="window.print()">Cetak Jadwal</button>
+      <button class="quick-btn" onclick="switchTab('legend')">Lihat Legenda</button>
+    </div>
+  </div>
+
+  <footer class="note">
+    <strong>Catatan:</strong> Setiap Selasa, Rabu, dan Kamis pukul 07.00–07.30, guru mendampingi kegiatan sholat Dhuha dan mengaji bersama — bagi siswa Muslim di Aula dan Muslimah di Musholla; siswa non-Muslim melaksanakan kegiatan keagamaan di ruang masing-masing. Kode gabungan (misal "2.4") menandakan sesi Agama yang berjalan paralel untuk beberapa kelompok agama sekaligus.
+    <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--faint);">&copy; Created by RayTheFishFR</div>
+  </footer>
+</div>
+
+<script>
+/* ---------- DATA ---------- */
+const teachers = {
+1:["Budiriyanto, M.Pd.","Kepsek"],
+2:["Miftahul Alim, S.Pd.I","AGI"],
+3:["Shofatul Ummah, S.Pd.I.","AGI"],
+4:["Yohanes Filbert Suwandi, S.Fil.","AGP"],
+5:["Lucya Susi Eliyanti","AGK"],
+6:["Ni Nyoman Astini","AGH"],
+7:["Miranti Rezki Aulia, S.Pd.","BIN"],
+8:["Ana Dahliana, S.Pd.","BIN"],
+9:["Prima Yuli Prasetya, S.Pd.","BIN"],
+10:["Abdul Hakim, S.Pd., M.M.","BIN"],
+11:["Amelia Maulinda, S.Pd.","PPA"],
+12:["Noor Hidayat, S.Pd.","PPA"],
+13:["Ismuji, S.Pd.","MAT"],
+14:["Sintowati, S.Pd.","MAT"],
+15:["Fathimatuzzahra, S.Pd.","MAT"],
+16:["Wiyana, S.Pd.","MAT"],
+17:["Sucipto, S.Pd.","MAL"],
+18:["Asa Agus Patoro, M.Pd.","MAL"],
+19:["Fretylia, S.Pd.","SEJ"],
+20:["Anggraini Lufi Hakim, S.Pd.","SEJ"],
+21:["Maskut, S.Pd.","BIG"],
+22:["Ulfa Umi Nur Barokah, S.Pd.","BIG/BIL"],
+23:["Achmad Riwayadi, S.Pd.","BIL"],
+24:["Sri Rahayu Abidin, M.Pd.","BIG"],
+25:["Saryadi, S.Pd.","PJK"],
+26:["Lintang Nurul Hamidah, S.Pd.","PJK"],
+27:["Choirul Abidin, S.Pd.","SDP"],
+28:["Sidharta Surya Y, S.Pd.","SDP"],
+29:["Lusy Syintia Jati, S.Pd., M.Pd.","FIS"],
+30:["Nandia Astrini Gunarto, S.Pd.","FIS"],
+31:["Muhammad Ali Basarudin, S.Pd.","FIS"],
+32:["Latifah Hikmawati, S.Pd.","KIM"],
+33:["Moh. Bahri, M.Pd.","KIM"],
+34:["Agus Sri Hono, M.Pd.","KIM"],
+35:["Meilina Kustiari, S.Pd.Gr.","BIO"],
+36:["Nour Triwidyatisa, S.Pd.","BIO/MUL"],
+37:["Bagyo Priyono, M.Pd.","BIO/MUL"],
+38:["Pandu Apriyani, S.Pd.","EKO/PRK"],
+39:["Agus Abdul Fatah, S.Pd., M.Si.","EKO"],
+40:["Nita Oryza, M.Pd.","EKO"],
+41:["Nimas Putri P, S.Pd.","SOS"],
+42:["Umi Nurroisah, S.Pd.","SOS"],
+43:["Kartika Busri, M.Pd.","GEO"],
+44:["Prima Windiyanti Mayasari, S.Pd.","GEO/PRK"],
+45:["Supriyanto, S.Pd.","GEO"],
+46:["Vikri Anto, S.Kom.","PRO"],
+47:["Muhammad Hanif Ramadhani, S.Kom","INF"],
+48:["Yosse Yassman, ST.","INF"],
+49:["Tri Adji Imam Syahadat, S.Pd.","BP"],
+50:["Faradila Elmi Sofiana, S.Tr.Keb","BP"],
+51:["Suci Oktaviani, M.Pd., Gr.","BIN"]
+};
+
+const mapelNames = {
+"Kepsek":"Kepala Sekolah",
+"AGI":"Pendidikan Agama Islam",
+"AGP":"Pendidikan Agama Kristen Protestan",
+"AGK":"Pendidikan Agama Katolik",
+"AGH":"Pendidikan Agama Hindu",
+"BIN":"Bahasa Indonesia",
+"PPA":"Pendidikan Pancasila",
+"MAT":"Matematika",
+"MAL":"Matematika Lanjutan (Peminatan)",
+"SEJ":"Sejarah",
+"BIG":"Bahasa Inggris",
+"BIL":"Bahasa Inggris Lanjutan (Peminatan)",
+"PJK":"PJOK (Pendidikan Jasmani, Olahraga, dan Kesehatan)",
+"SDP":"Seni, Drama, dan Pertunjukan",
+"FIS":"Fisika",
+"KIM":"Kimia",
+"BIO":"Biologi",
+"MUL":"Muatan Lokal",
+"EKO":"Ekonomi",
+"PRK":"Prakarya dan Kewirausahaan",
+"SOS":"Sosiologi",
+"GEO":"Geografi",
+"PRO":"Pemrograman",
+"INF":"Informatika",
+"BP":"Bimbingan Konseling"
+};
+function fullMapelName(code){ return mapelNames[code] || code; }
+
+function colIndex(tier, num){
+  const base = tier==='X' ? 0 : tier==='XI' ? 8 : 16;
+  return base + (num-1);
+}
+
+const schedule = {
+"Senin":[
+  {b:1,l:"Pembiasaan",t:"07.00 – 08.10"},
+  {s:2,t:"08.10–08.50",c:["2.4","2.4",20,31,30,36,16,32,18,19,10,43,12,38,22,23,25,13,33,37,26,24,15,39]},
+  {s:3,t:"08.50–09.30",c:["2.4","2.4",20,31,30,36,16,32,18,19,10,43,12,38,22,23,25,13,33,37,26,24,15,39]},
+  {s:4,t:"09.30–10.10",c:["2.4","2.4",49,31,30,41,11,46,18,19,12,14,51,38,22,23,47,25,13,37,17,26,24,39]},
+  {b:1,l:"Istirahat",t:"10.10–10.30"},
+  {s:5,t:"10.30–11.10",c:[21,40,16,35,37,41,11,46,"3.4",18,12,14,51,22,43,42,47,25,13,34,17,26,24,44]},
+  {s:6,t:"11.10–11.50",c:[21,40,16,35,37,8,46,11,"3.4",18,14,10,19,22,43,42,47,27,12,34,17,28,41,44]},
+  {s:7,t:"11.50–12.30",c:[21,40,32,35,16,8,46,11,51,18,14,10,19,22,43,42,7,27,12,34,15,28,41,44]},
+  {b:1,l:"Isoma",t:"12.30–13.15"},
+  {s:8,t:"13.15–13.55",c:[43,21,32,"2.6",16,30,35,45,51,47,22,36,19,42,38,49,7,44,37,17,15,39,23,41]},
+  {s:9,t:"13.55–14.35",c:[43,21,8,"2.6",32,30,35,45,12,47,22,36,14,42,38,7,"3.4",44,37,17,20,39,23,41]},
+  {s:10,t:"14.35–15.15",c:[43,21,8,"2.6",32,30,35,45,12,47,22,36,14,42,38,7,"3.4",44,37,17,20,39,23,41]}
+],
+"Selasa":[
+  {b:1,l:"Sholat Dhuha / Keagamaan",t:"07.00–07.30"},
+  {s:1,t:"07.30–08.10",c:[48,32,37,45,2,8,30,40,17,14,18,10,39,43,22,19,29,24,25,15,34,44,26,28]},
+  {s:2,t:"08.10–08.50",c:[48,32,37,45,2,8,30,40,17,14,18,10,39,43,22,19,29,24,25,15,34,44,26,28]},
+  {s:3,t:"08.50–09.30",c:[32,16,48,45,2,46,30,40,27,51,10,14,39,43,22,19,33,29,13,25,17,"3.4",44,26]},
+  {s:4,t:"09.30–10.10",c:[32,16,48,8,45,46,20,30,27,51,10,14,36,19,12,42,33,29,13,25,17,"3.4",44,26]},
+  {b:1,l:"Istirahat",t:"10.10–10.30"},
+  {s:5,t:"10.30–11.10",c:[26,35,21,8,45,2,20,30,25,47,14,32,36,19,12,42,13,29,50,17,37,24,23,39]},
+  {s:6,t:"11.10–11.50",c:[26,35,21,16,45,2,28,30,25,47,14,32,36,19,42,44,13,33,29,17,37,24,23,39]},
+  {s:7,t:"11.50–12.30",c:[11,35,21,16,8,2,28,15,30,36,46,12,"3.4",51,42,44,7,33,29,37,24,9,38,23]},
+  {b:1,l:"Isoma",t:"12.30–13.15"},
+  {s:8,t:"13.15–13.55",c:[11,43,"2.5",21,8,40,47,15,30,36,46,12,"3.4",51,42,22,7,33,29,37,24,9,38,23]},
+  {s:9,t:"13.55–14.35",c:[8,43,"2.5",21,46,40,47,28,32,27,"3.4",18,14,12,7,22,19,44,20,34,23,15,9,38]},
+  {s:10,t:"14.35–15.15",c:[8,43,"2.5",21,46,40,49,28,32,27,"3.4",18,14,12,7,22,19,44,20,34,23,15,9,38]}
+],
+"Rabu":[
+  {b:1,l:"Sholat Dhuha / Keagamaan",t:"07.00–07.30"},
+  {s:1,t:"07.30–08.10",c:[46,26,8,32,11,16,45,20,51,25,30,43,22,14,27,38,17,29,24,7,28,39,15,9]},
+  {s:2,t:"08.10–08.50",c:[46,26,8,32,11,16,45,20,51,25,30,43,22,14,27,38,17,29,24,7,28,39,15,9]},
+  {s:3,t:"08.50–09.30",c:[28,11,26,8,16,32,45,51,47,"3.4.5",25,43,22,21,14,38,17,24,46,15,50,41,39,23]},
+  {s:4,t:"09.30–10.10",c:[28,11,26,8,16,32,40,51,47,"3.4.5",25,50,49,21,14,43,29,24,46,15,7,41,39,23]},
+  {b:1,l:"Istirahat",t:"10.10–10.30"},
+  {s:5,t:"10.30–11.10",c:[37,8,16,49,35,21,40,47,32,18,36,"3.4.5",44,51,42,43,29,17,27,24,7,20,39,23]},
+  {s:6,t:"11.10–11.50",c:[37,8,16,46,35,21,40,47,32,18,36,"3.4.5",44,51,42,43,29,17,27,24,15,20,9,2]},
+  {s:7,t:"11.50–12.30",c:[42,28,11,46,35,21,51,49,32,12,36,44,27,38,"3.4.5",14,24,7,17,20,15,23,9,2]},
+  {b:1,l:"Isoma",t:"12.30–13.15"},
+  {s:8,t:"13.15–13.55",c:[42,28,11,40,21,35,51,2,19,12,49,44,27,38,"3.4.5",14,24,7,17,20,37,23,41,50]},
+  {s:9,t:"13.55–14.35",c:[20,42,28,40,21,35,16,2,19,46,27,36,18,43,38,"3.4.5",47,12,7,23,37,11,41,44]},
+  {s:10,t:"14.35–15.15",c:[20,42,28,40,21,35,16,2,19,46,27,36,18,43,38,"3.4.5",47,12,7,23,37,11,41,44]}
+],
+"Kamis":[
+  {b:1,l:"Sholat Dhuha / Keagamaan",t:"07.00–07.30"},
+  {s:1,t:"07.30–08.10",c:[31,37,46,26,28,47,21,35,30,36,32,25,51,42,19,23,33,17,24,27,34,38,2,15]},
+  {s:2,t:"08.10–08.50",c:[31,37,46,26,28,47,21,35,30,36,32,25,51,42,19,23,33,17,24,27,34,38,2,15]},
+  {s:3,t:"08.50–09.30",c:[31,49,42,11,26,20,21,35,30,36,18,22,25,14,19,27,33,17,7,3,34,44,28,9]},
+  {s:4,t:"09.30–10.10",c:[16,31,42,11,26,20,32,21,46,51,18,22,25,14,43,27,24,33,7,3,23,44,28,9]},
+  {b:1,l:"Istirahat",t:"10.10–10.30"},
+  {s:5,t:"10.30–11.10",c:[16,31,40,28,47,26,32,21,46,51,18,22,34,25,43,12,24,33,37,38,23,44,11,20]},
+  {s:6,t:"11.10–11.50",c:[8,31,40,28,47,26,41,21,17,14,36,27,34,25,22,12,50,19,37,38,23,15,11,20]},
+  {s:7,t:"11.50–12.30",c:[8,16,40,42,20,28,41,51,17,14,36,27,34,44,22,7,46,19,29,50,"3.4",15,24,11]},
+  {b:1,l:"Isoma",t:"12.30–13.15"},
+  {s:8,t:"13.15–13.55",c:[35,16,31,42,20,28,2,51,22,30,19,32,18,44,49,7,46,50,29,23,"3.4",41,24,11]},
+  {s:9,t:"13.55–14.35",c:[35,48,31,16,8,11,2,36,22,30,19,32,18,27,7,43,17,46,"3.4",23,38,41,20,24]},
+  {s:10,t:"14.35–15.15",c:[35,48,31,16,8,11,2,36,22,50,19,32,18,27,7,43,17,46,"3.4",23,38,41,20,24]}
+],
+"Jumat":[
+  {s:1,t:"07.00–07.40",c:[40,8,35,20,42,16,26,15,18,30,32,19,39,49,25,38,13,7,33,12,24,23,44,41]},
+  {s:2,t:"07.40–08.20",c:[40,8,35,20,42,16,26,15,18,30,32,19,39,"3.4",25,38,13,7,33,12,24,23,44,41]},
+  {s:3,t:"08.20–08.40",c:[40,20,35,48,49,45,36,26,50,30,32,19,34,"3.4",14,25,27,13,33,7,11,23,44,24]},
+  {b:1,l:"Istirahat",t:"08.40–09.20"},
+  {s:4,t:"09.20–09.55",c:[49,20,43,48,40,45,36,26,47,22,30,18,34,21,14,25,27,13,17,7,11,9,50,24]},
+  {s:5,t:"09.55–10.30",c:[16,46,43,37,40,45,51,41,47,22,30,18,36,21,44,14,12,"3.4",17,24,7,9,39,15]},
+  {s:6,t:"10.30–11.05",c:[16,46,43,37,40,49,51,41,47,22,30,18,36,21,44,14,12,"3.4",17,24,7,50,39,15]}
+]
+};
+
+/* ---------- COLOR ASSIGNMENT ---------- */
+const palette = [
+  {bg:"#dbe7fd",fg:"#1e4fc4"},   // blue
+  {bg:"#fbdce9",fg:"#a13462"},   // pink
+  {bg:"#d7f0e2",fg:"#12784f"},   // mint
+  {bg:"#fce6c7",fg:"#a8630a"},   // peach
+  {bg:"#e7ddf7",fg:"#6737a8"},   // lavender
+  {bg:"#d3f0ee",fg:"#0f766e"},   // teal
+  {bg:"#fde6d6",fg:"#b5480f"},   // apricot
+];
+const indigoCombo = {bg:"#e2e4fb",fg:"#3a3fb0"};
+function hashColor(str){
+  let h=0; for(let i=0;i<str.length;i++) h=(h*31+str.charCodeAt(i))|0;
+  return palette[Math.abs(h)%palette.length];
+}
+function resolveCode(code){
+  const parts = String(code).split('.');
+  const codes=[], names=[], gurus=[];
+  parts.forEach(p=>{
+    const t = teachers[p];
+    if(t){
+      t[1].split('/').forEach(c=>{
+        if(!codes.includes(c)){ codes.push(c); names.push(fullMapelName(c)); }
+      });
+      gurus.push(t[0]);
+    }
+  });
+  const combo = parts.length>1;
+  const color = combo ? indigoCombo : hashColor(codes[0]||'X');
+  return { code: codes.join(' / '), name: names.join(' / '), guru: gurus.join(' & '), color };
+}
+
+/* ---------- UI: SIDEBAR ---------- */
+const tierToggle = document.getElementById('tierToggle');
+const classGrid = document.getElementById('classGrid');
+let currentTier = 'X';
+let selected = null;
+
+['X','XI','XII'].forEach(tier=>{
+  const b = document.createElement('button');
+  b.className = 'tier-btn'+(tier===currentTier?' active':'');
+  b.textContent = tier;
+  b.onclick = ()=>{ currentTier=tier; renderClassGrid(); document.querySelectorAll('.tier-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); };
+  tierToggle.appendChild(b);
+});
+
+function renderClassGrid(){
+  classGrid.innerHTML='';
+  for(let n=1;n<=8;n++){
+    const btn = document.createElement('button');
+    btn.className='class-btn'+((selected&&selected.tier===currentTier&&selected.num===n)?' selected':'');
+    btn.textContent = currentTier+'-'+n;
+    btn.onclick = ()=>selectClass(currentTier,n);
+    classGrid.appendChild(btn);
+  }
+}
+renderClassGrid();
+
+function selectClass(tier,num){
+  selected = {tier,num};
+  renderClassGrid();
+  document.getElementById('panelClassName').textContent = `${tier}-${num}`;
+  renderSchedule(tier,num);
+}
+
+/* ---------- SCHEDULE RENDER ---------- */
+function renderSchedule(tier,num){
+  const idx = colIndex(tier,num);
+  document.getElementById('emptyState').style.display='none';
+  const grid = document.getElementById('weekGrid');
+  grid.style.display='grid';
+  grid.innerHTML='';
+  let totalSessions=0;
+
+  const dayNames = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const todayName = dayNames[new Date().getDay()];
+
+  Object.keys(schedule).forEach(day=>{
+    const isToday = day === todayName;
+    const col = document.createElement('div');
+    col.className = 'day-col-wrap'+(isToday?' today':'');
+    const head = document.createElement('div');
+    head.className='day-col-head'+(isToday?' today':'');
+    head.textContent = day;
+    const body = document.createElement('div');
+    body.className='day-col';
+
+    let i=0;
+    schedule[day].forEach(item=>{
+      const card = document.createElement('div');
+      card.style.transitionDelay = (i*0.04)+'s';
+      i++;
+      if(item.b){
+        card.className='card brk';
+        card.innerHTML = `<div class="time">${item.t}</div><div>${item.l}</div>`;
+      } else {
+        totalSessions++;
+        const code = item.c[idx];
+        const info = resolveCode(code);
+        card.className='card';
+        card.style.background = info.color.bg;
+        card.style.color = info.color.fg;
+        card.dataset.subj = (info.name+' '+info.guru).toLowerCase();
+        card.innerHTML = `<div class="time">${item.t}</div><div class="subj">${info.name||'—'}</div><div class="who">${info.guru||''}</div>`;
+      }
+      body.appendChild(card);
+    });
+
+    col.appendChild(head);
+    col.appendChild(body);
+    grid.appendChild(col);
+  });
+
+  document.getElementById('infoSessions').textContent = totalSessions;
+  applyFilter();
+  observePopIn();
+
+  // Safety net: if scroll-based reveal doesn't fire (some embedded viewers
+  // don't report intersection correctly), force cards visible anyway.
+  setTimeout(()=>{
+    document.querySelectorAll('.card:not(.in-view)').forEach(c=>c.classList.add('in-view'));
+  }, 900);
+}
+
+/* ---------- SCROLL POP-IN ---------- */
+let popObserver = null;
+function observePopIn(){
+  if(popObserver) popObserver.disconnect();
+  popObserver = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('in-view');
+        popObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.card').forEach(card=>popObserver.observe(card));
+}
+
+/* ---------- SEARCH FILTER ---------- */
+function applyFilter(){
+  const q = document.getElementById('searchBox').value.trim().toLowerCase();
+  document.querySelectorAll('.card:not(.brk)').forEach(card=>{
+    if(!q){ card.classList.remove('dim'); return; }
+    const match = card.dataset.subj && card.dataset.subj.includes(q);
+    card.classList.toggle('dim', !match);
+  });
+}
+document.getElementById('searchBox').addEventListener('input', applyFilter);
+
+/* ---------- TABS ---------- */
+function switchTab(tab){
+  document.getElementById('tabSchedule').classList.toggle('active', tab==='schedule');
+  document.getElementById('tabLegend').classList.toggle('active', tab==='legend');
+  document.getElementById('scheduleView').style.display = tab==='schedule' ? 'block' : 'none';
+  document.getElementById('legendView').classList.toggle('show', tab==='legend');
+}
+
+/* ---------- LEGEND ---------- */
+const legendBody = document.getElementById('legendBody');
+Object.keys(mapelNames).forEach(code=>{
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><span class="legend-code">${code}</span></td><td>${mapelNames[code]}</td>`;
+  legendBody.appendChild(tr);
+});
+
+/* ---------- SIDEBAR: NAV SWITCHING ---------- */
+function switchSidePanel(name){
+  ['kelas','guru','settings'].forEach(p=>{
+    const panel = document.getElementById('sidePanel-'+p);
+    if(p===name){
+      panel.style.display = 'block';
+      panel.classList.remove('panel-enter');
+      void panel.offsetWidth; // force reflow so the animation restarts every time
+      panel.classList.add('panel-enter');
+    } else {
+      panel.style.display = 'none';
+      panel.classList.remove('panel-enter');
+    }
+  });
+  document.querySelectorAll('.side-nav-item').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.panel===name);
+  });
+  if(name==='guru'){ renderGuruList(); }
+}
+
+/* ---------- SIDEBAR: GURU DIRECTORY ---------- */
+function renderGuruList(){
+  const q = (document.getElementById('guruSearch').value||'').trim().toLowerCase();
+  const list = document.getElementById('guruList');
+  list.innerHTML = '';
+  let i = 0;
+  Object.values(teachers).forEach(([name, mapelCode])=>{
+    if(q && !name.toLowerCase().includes(q)) return;
+    const subjects = mapelCode.split('/').map(fullMapelName);
+    const item = document.createElement('div');
+    item.className = 'guru-item';
+    item.style.animationDelay = (i*0.045)+'s';
+    i++;
+    item.innerHTML = `<div class="name">${name}</div>
+      <div class="subjects">${subjects.map(s=>`<span class="subj-badge">${s}</span>`).join('')}</div>`;
+    list.appendChild(item);
+  });
+  if(!list.children.length){
+    list.innerHTML = '<div style="padding:10px 4px;font-size:12.5px;color:var(--faint);">Tidak ditemukan.</div>';
+  }
+}
+
+/* ---------- SIDEBAR: SETTINGS ---------- */
+function applySettings(){
+  const hideBreaks = document.getElementById('toggleHideBreaks').checked;
+  const showCodes = document.getElementById('toggleShowCodes').checked;
+  document.getElementById('weekGrid').classList.toggle('hide-breaks', hideBreaks);
+  document.getElementById('weekGrid').classList.toggle('hide-codes', !showCodes);
+}
+</script>
+</body>
+</html>
