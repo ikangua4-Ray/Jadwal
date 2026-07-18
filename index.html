@@ -305,9 +305,18 @@
     .card{
       animation:none;opacity:1;transform:none;
       break-inside:avoid;page-break-inside:avoid;
+      margin-bottom:10px;
     }
-    .day-col-head{break-after:avoid;page-break-after:avoid;}
-    .week-grid{grid-template-columns:repeat(2,1fr);}
+    .day-col-head{break-after:avoid;page-break-after:avoid;margin-bottom:14px;}
+    /* Grid columns paginate unreliably in Chrome's print engine
+       (can duplicate/cut content across pages) — stack days instead. */
+    .week-grid{display:block;}
+    .day-col-wrap{
+      display:block;width:100%;
+      margin-bottom:36px;
+      page-break-before:always;break-before:page;
+    }
+    .day-col-wrap:first-child{page-break-before:auto;break-before:auto;}
   }
 </style>
 </head>
