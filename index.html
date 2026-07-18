@@ -6,6 +6,7 @@
 <title>JadwalKelas — SMAS Yayasan Pupuk Kaltim</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <style>
   :root{
     --navy:#0b1030;
@@ -131,7 +132,17 @@
     padding:9px 4px;border-bottom:1px solid var(--line);
     opacity:0;transform:translateY(-12px);
     animation:guruItemIn .45s cubic-bezier(.22,1,.36,1) forwards;
+    cursor:pointer;
   }
+  .guru-item:hover .name{color:var(--blue);}
+  .guru-detail{
+    margin:6px 0 4px;padding:8px 10px;background:#f4f5fb;border-radius:9px;
+    font-size:11.5px;color:var(--muted);display:none;
+  }
+  .guru-detail.show{display:block;}
+  .guru-detail .row{padding:4px 0;border-bottom:1px dashed var(--line);}
+  .guru-detail .row:last-child{border-bottom:none;}
+  .guru-detail .row b{color:var(--ink);}
   @keyframes guruItemIn{to{opacity:1;transform:translateY(0);}}
   .guru-item .name{font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:3px;}
   .guru-item .subjects{display:flex;flex-wrap:wrap;gap:4px;}
@@ -199,6 +210,11 @@
   }
   .class-btn:hover{border-color:var(--blue);}
   .class-btn.selected{background:var(--blue);border-color:var(--blue);color:#fff;}
+  .class-btn.btn-enter{
+    opacity:0;transform:translateY(-14px);
+    animation:classBtnIn .4s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  @keyframes classBtnIn{to{opacity:1;transform:translateY(0);}}
   .sidebar .quick{margin-top:26px;}
   .quick-link{
     display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted);
@@ -212,7 +228,92 @@
   .main-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
   .main-head h2{font-size:16px;font-weight:700;margin:0;}
   .main-head .sub{font-size:12.5px;color:var(--faint);margin-top:2px;}
+  .main-head-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .mini-action{
+    border:1px solid var(--line);background:#fff;border-radius:9px;
+    padding:8px 12px;font-family:inherit;font-size:12px;font-weight:600;color:var(--ink);
+    cursor:pointer;transition:border-color .15s ease, background .15s ease;white-space:nowrap;
+  }
+  .mini-action:hover{border-color:var(--blue);background:#f7f9ff;}
+  .mini-action.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+
+  .user-badge{
+    display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--ink);
+    background:#f4f5fb;padding:6px 12px;border-radius:20px;white-space:nowrap;
+  }
+  .user-badge button{
+    border:none;background:none;cursor:pointer;font-size:11px;color:var(--muted);
+    font-weight:700;text-decoration:underline;font-family:inherit;
+  }
+
+  .auth-overlay{
+    position:absolute;inset:0;z-index:50;
+    background:rgba(10,12,30,.55);
+    display:flex;align-items:center;justify-content:center;padding:24px;
+  }
+  .auth-card{
+    background:#fff;border-radius:18px;padding:26px;max-width:340px;width:100%;
+    box-shadow:0 20px 60px rgba(5,8,30,.35);
+  }
+  .auth-card h3{margin:0 0 8px;font-size:18px;font-weight:800;color:var(--ink);}
+  .auth-note{font-size:11.5px;color:var(--muted);line-height:1.5;margin:0 0 16px;}
+  .auth-input{
+    width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;
+    font-family:inherit;font-size:13.5px;color:var(--ink);margin-bottom:10px;outline:none;
+  }
+  .auth-input:focus{border-color:var(--blue);}
+  .auth-row2{display:flex;gap:8px;margin-bottom:6px;}
+  .auth-label{display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin:2px 0 8px;}
+
+  .auth-select-row{display:flex;gap:10px;margin-bottom:18px;position:relative;}
+  .auth-dd{position:relative;flex:1;}
+  .auth-dd-btn{
+    width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;
+    padding:11px 12px;font-family:inherit;font-size:13px;font-weight:600;color:var(--ink);
+    cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:6px;
+    transition:border-color .15s ease;
+  }
+  .auth-dd-btn:hover{border-color:var(--blue);}
+  .auth-dd-btn:focus{outline:none;}
+  .auth-dd-btn .chev{color:var(--faint);font-size:11px;transition:transform .2s ease;}
+  .auth-dd.open .auth-dd-btn .chev{transform:rotate(180deg);}
+  .auth-dd.open .auth-dd-btn{
+    border-color:var(--blue);
+    animation:ddGlow 1.7s ease-in-out infinite;
+  }
+  @keyframes ddGlow{
+    0%,100%{box-shadow:0 0 0 3px rgba(59,109,240,.12), 0 0 14px rgba(59,109,240,.30);}
+    50%{box-shadow:0 0 0 5px rgba(59,109,240,.18), 0 0 24px rgba(59,109,240,.55);}
+  }
+  .auth-dd-panel{
+    position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:8;
+    background:#fff;border:1px solid var(--line);border-radius:12px;
+    box-shadow:0 14px 34px rgba(5,8,30,.18);
+    padding:6px;max-height:230px;overflow-y:auto;
+    display:none;
+  }
+  .auth-dd-panel.open{display:block;}
+  .auth-dd-option{
+    display:block;width:100%;text-align:left;border:none;background:none;
+    padding:10px 12px;border-radius:8px;font-family:inherit;font-size:13.5px;font-weight:600;color:var(--ink);
+    cursor:pointer;
+    opacity:0;transform:translateY(-10px);
+    animation:classBtnIn .35s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  .auth-dd-option:hover{background:#f4f5fb;}
+  .auth-dd-option.selected{background:var(--blue);color:#fff;}
+  .auth-select{
+    flex:1;border:1px solid var(--line);border-radius:10px;padding:11px 8px;
+    font-family:inherit;font-size:13px;color:var(--ink);background:#fff;
+  }
+  .auth-skip{
+    display:block;width:100%;text-align:center;margin-top:14px;
+    border:none;background:none;cursor:pointer;font-family:inherit;
+    font-size:12px;color:var(--faint);text-decoration:underline;
+  }
+  .auth-error{color:#c0392b;font-size:12px;font-weight:600;margin:-4px 0 10px;}
   .week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+  .week-grid.today-only-mode{grid-template-columns:1fr;max-width:420px;}
   .day-col-head{
     font-size:15px;font-weight:800;color:var(--ink);text-align:center;
     letter-spacing:.01em;
@@ -336,6 +437,7 @@
       <input id="searchBox" type="text" placeholder="Cari mata pelajaran atau nama guru…">
     </div>
     <div class="topbar-right">
+      <div id="userBadge" class="user-badge" style="display:none;"></div>
       <button class="icon-btn" title="Cetak jadwal" onclick="window.print()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
       </button>
@@ -422,6 +524,10 @@
             <h2>Jadwal Mingguan</h2>
             <div class="sub">Semester 1 · Tahun Ajaran 2026/2027</div>
           </div>
+          <div class="main-head-actions">
+            <button class="mini-action" id="todayOnlyBtn" onclick="toggleTodayOnly()">📅 Hari Ini Saja</button>
+            <button class="mini-action" onclick="exportAsImage()">🖼️ Ekspor Gambar</button>
+          </div>
         </div>
         <div id="weekGrid" class="week-grid" style="display:none;"></div>
         <div id="emptyState" class="empty-state">Pilih kelas di panel kiri untuk menampilkan jadwal.</div>
@@ -454,6 +560,34 @@
     <strong>Catatan:</strong> Setiap Selasa, Rabu, dan Kamis pukul 07.00–07.30, guru mendampingi kegiatan sholat Dhuha dan mengaji bersama — bagi siswa Muslim di Aula dan Muslimah di Musholla; siswa non-Muslim melaksanakan kegiatan keagamaan di ruang masing-masing. Kode gabungan (misal "2.4") menandakan sesi Agama yang berjalan paralel untuk beberapa kelompok agama sekaligus.
     <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--faint);">&copy; Created by RayTheFishFR</div>
   </footer>
+
+  <div id="authOverlay" class="auth-overlay" style="display:none;">
+    <div class="auth-card">
+      <h3 id="authTitle">Buat Profil Lokal</h3>
+      <p class="auth-note">Disimpan hanya di perangkat/browser ini — bukan akun online, cuma buat mengingat nama dan kelasmu. Password di sini cuma kunci ringan, bukan enkripsi asli, jadi jangan pakai password pentingmu.</p>
+      <div id="authFieldsNew">
+        <input id="authName" class="auth-input" type="text" placeholder="Nama kamu">
+        <input id="authPass" class="auth-input" type="password" placeholder="Buat password (bebas, sekadar kunci)">
+        <label class="auth-label">Kelas kamu</label>
+        <div class="auth-select-row">
+          <div class="auth-dd" id="ddTier">
+            <button type="button" class="auth-dd-btn" onclick="toggleAuthDD('tier')">
+              Tingkat: <b id="ddTierLabel">X</b> <span class="chev">▾</span>
+            </button>
+            <div class="auth-dd-panel" id="ddTierPanel"></div>
+          </div>
+          <div class="auth-dd" id="ddNum">
+            <button type="button" class="auth-dd-btn" onclick="toggleAuthDD('num')">
+              Kelas: <b id="ddNumLabel">1</b> <span class="chev">▾</span>
+            </button>
+            <div class="auth-dd-panel" id="ddNumPanel"></div>
+          </div>
+        </div>
+        <button class="quick-btn primary" style="width:100%;" onclick="registerProfile()">Simpan &amp; Lanjutkan</button>
+      </div>
+      <button class="auth-skip" onclick="skipAuth()">Lewati, langsung pakai tanpa profil</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -649,6 +783,26 @@ function resolveCode(code){
   return { code: codes.join(' / '), name: names.join(' / '), guru: gurus.join(' & '), color };
 }
 
+/* ---------- TEACHER SCHEDULE LOOKUP ---------- */
+const classNames = [];
+['X','XI','XII'].forEach(t=>{ for(let n=1;n<=8;n++) classNames.push(t+'-'+n); });
+
+function getTeacherSchedule(teacherId){
+  const id = String(teacherId);
+  const rows = [];
+  Object.keys(schedule).forEach(day=>{
+    schedule[day].forEach(item=>{
+      if(item.b) return;
+      const matches = [];
+      item.c.forEach((code,idx)=>{
+        if(String(code).split('.').includes(id)) matches.push(classNames[idx]);
+      });
+      if(matches.length) rows.push({ day, time:item.t, classes:matches });
+    });
+  });
+  return rows;
+}
+
 /* ---------- UI: SIDEBAR ---------- */
 const tierToggle = document.getElementById('tierToggle');
 const classGrid = document.getElementById('classGrid');
@@ -667,7 +821,8 @@ function renderClassGrid(){
   classGrid.innerHTML='';
   for(let n=1;n<=8;n++){
     const btn = document.createElement('button');
-    btn.className='class-btn'+((selected&&selected.tier===currentTier&&selected.num===n)?' selected':'');
+    btn.className='class-btn btn-enter'+((selected&&selected.tier===currentTier&&selected.num===n)?' selected':'');
+    btn.style.animationDelay = ((n-1)*0.05)+'s';
     btn.textContent = currentTier+'-'+n;
     btn.onclick = ()=>selectClass(currentTier,n);
     classGrid.appendChild(btn);
@@ -680,9 +835,15 @@ function selectClass(tier,num){
   renderClassGrid();
   document.getElementById('panelClassName').textContent = `${tier}-${num}`;
   renderSchedule(tier,num);
+
+  localStorage.setItem('jadwal_lastClass', JSON.stringify({tier,num}));
+  const acc = getProfile();
+  if(acc){ acc.tier=tier; acc.num=num; localStorage.setItem('jadwalAccount', JSON.stringify(acc)); }
 }
 
 /* ---------- SCHEDULE RENDER ---------- */
+let todayName = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][new Date().getDay()];
+
 function renderSchedule(tier,num){
   const idx = colIndex(tier,num);
   document.getElementById('emptyState').style.display='none';
@@ -691,13 +852,11 @@ function renderSchedule(tier,num){
   grid.innerHTML='';
   let totalSessions=0;
 
-  const dayNames = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-  const todayName = dayNames[new Date().getDay()];
-
   Object.keys(schedule).forEach(day=>{
     const isToday = day === todayName;
     const col = document.createElement('div');
     col.className = 'day-col-wrap'+(isToday?' today':'');
+    col.dataset.day = day;
     const head = document.createElement('div');
     head.className='day-col-head'+(isToday?' today':'');
     head.textContent = day;
@@ -733,12 +892,66 @@ function renderSchedule(tier,num){
   document.getElementById('infoSessions').textContent = totalSessions;
   applyFilter();
   observePopIn();
+  applyTodayOnlyFilter();
 
   // Safety net: if scroll-based reveal doesn't fire (some embedded viewers
   // don't report intersection correctly), force cards visible anyway.
   setTimeout(()=>{
     document.querySelectorAll('.card:not(.in-view)').forEach(c=>c.classList.add('in-view'));
   }, 900);
+}
+
+/* ---------- TODAY-ONLY MODE ---------- */
+let todayOnlyActive = false;
+function toggleTodayOnly(){
+  todayOnlyActive = !todayOnlyActive;
+  document.getElementById('todayOnlyBtn').classList.toggle('active', todayOnlyActive);
+  applyTodayOnlyFilter();
+}
+function applyTodayOnlyFilter(){
+  const grid = document.getElementById('weekGrid');
+  const isSchoolDay = ['Senin','Selasa','Rabu','Kamis','Jumat'].includes(todayName);
+  if(todayOnlyActive && !isSchoolDay){
+    alert('Hari ini bukan hari sekolah (Sabtu/Minggu), jadi mode "Hari Ini" belum bisa menampilkan apa-apa. Menampilkan jadwal seminggu penuh saja.');
+    todayOnlyActive = false;
+    document.getElementById('todayOnlyBtn').classList.remove('active');
+  }
+  grid.classList.toggle('today-only-mode', todayOnlyActive);
+  document.querySelectorAll('.day-col-wrap').forEach(col=>{
+    const match = col.dataset.day === todayName;
+    col.style.display = (todayOnlyActive && !match) ? 'none' : '';
+  });
+}
+
+/* ---------- EXPORT AS IMAGE ---------- */
+function exportAsImage(){
+  if(!selected){ alert('Pilih kelas dulu sebelum ekspor gambar.'); return; }
+  if(typeof html2canvas === 'undefined'){
+    alert('Fitur ekspor gambar belum siap (koneksi internet dibutuhkan untuk memuat pustaka html2canvas). Coba lagi sebentar.');
+    return;
+  }
+  const target = document.getElementById('scheduleView');
+  const btn = event && event.target;
+  if(btn) btn.textContent = '⏳ Memproses…';
+  html2canvas(target, { backgroundColor:'#ffffff', scale:2, useCORS:true, allowTaint:true }).then(canvas=>{
+    if(btn) btn.textContent = '🖼️ Ekspor Gambar';
+    const fileName = `Jadwal-${selected.tier}-${selected.num}.png`;
+    canvas.toBlob(blob=>{
+      const file = new File([blob], fileName, {type:'image/png'});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        navigator.share({ files:[file], title:`Jadwal ${selected.tier}-${selected.num}` }).catch(()=>{});
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = fileName;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    }, 'image/png');
+  }).catch(()=>{
+    if(btn) btn.textContent = '🖼️ Ekspor Gambar';
+    alert('Gagal membuat gambar. Coba lagi.');
+  });
 }
 
 /* ---------- SCROLL POP-IN ---------- */
@@ -809,7 +1022,7 @@ function renderGuruList(){
   const list = document.getElementById('guruList');
   list.innerHTML = '';
   let i = 0;
-  Object.values(teachers).forEach(([name, mapelCode])=>{
+  Object.entries(teachers).forEach(([id, [name, mapelCode]])=>{
     if(q && !name.toLowerCase().includes(q)) return;
     const subjects = mapelCode.split('/').map(fullMapelName);
     const item = document.createElement('div');
@@ -817,12 +1030,26 @@ function renderGuruList(){
     item.style.animationDelay = (i*0.045)+'s';
     i++;
     item.innerHTML = `<div class="name">${name}</div>
-      <div class="subjects">${subjects.map(s=>`<span class="subj-badge">${s}</span>`).join('')}</div>`;
+      <div class="subjects">${subjects.map(s=>`<span class="subj-badge">${s}</span>`).join('')}</div>
+      <div class="guru-detail" id="guru-detail-${id}"></div>`;
+    item.addEventListener('click', ()=>toggleGuruDetail(id));
     list.appendChild(item);
   });
   if(!list.children.length){
     list.innerHTML = '<div style="padding:10px 4px;font-size:12.5px;color:var(--faint);">Tidak ditemukan.</div>';
   }
+}
+
+function toggleGuruDetail(id){
+  const detail = document.getElementById('guru-detail-'+id);
+  const isShown = detail.classList.contains('show');
+  document.querySelectorAll('.guru-detail.show').forEach(d=>d.classList.remove('show'));
+  if(isShown) return;
+  const rows = getTeacherSchedule(id);
+  detail.innerHTML = rows.length
+    ? rows.map(r=>`<div class="row"><b>${r.day}</b> · ${r.time} — Kelas: ${r.classes.join(', ')}</div>`).join('')
+    : '<div class="row">Tidak ada jadwal mengajar terjadwal.</div>';
+  detail.classList.add('show');
 }
 
 /* ---------- SIDEBAR: SETTINGS ---------- */
@@ -832,6 +1059,141 @@ function applySettings(){
   document.getElementById('weekGrid').classList.toggle('hide-breaks', hideBreaks);
   document.getElementById('weekGrid').classList.toggle('hide-codes', !showCodes);
 }
+
+/* ---------- LOCAL PROFILE (NOT REAL AUTH — SEE NOTE IN MODAL) ---------- */
+function getProfile(){
+  try{ return JSON.parse(localStorage.getItem('jadwalAccount')); }catch(e){ return null; }
+}
+
+let authSelected = { tier:'X', num:1 };
+
+function populateAuthNumSelect(){
+  document.getElementById('ddTierLabel').textContent = authSelected.tier;
+  document.getElementById('ddNumLabel').textContent = authSelected.num;
+}
+
+function toggleAuthDD(which){
+  const otherWhich = which === 'tier' ? 'num' : 'tier';
+  const otherDD = document.getElementById('dd'+capitalize(otherWhich));
+  const otherPanel = document.getElementById('dd'+capitalize(otherWhich)+'Panel');
+  otherDD.classList.remove('open');
+  otherPanel.classList.remove('open');
+
+  const dd = document.getElementById('dd'+capitalize(which));
+  const panel = document.getElementById('dd'+capitalize(which)+'Panel');
+  const isOpen = panel.classList.contains('open');
+  if(isOpen){
+    dd.classList.remove('open');
+    panel.classList.remove('open');
+    return;
+  }
+  panel.innerHTML = '';
+  const options = which === 'tier' ? ['X','XI','XII'] : [1,2,3,4,5,6,7,8];
+  options.forEach((opt,i)=>{
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'auth-dd-option'+(String(opt)===String(authSelected[which])?' selected':'');
+    b.style.animationDelay = (i*0.05)+'s';
+    b.textContent = which==='tier' ? opt : `Kelas ${authSelected.tier}-${opt}`;
+    b.onclick = ()=>{
+      authSelected[which] = opt;
+      populateAuthNumSelect();
+      dd.classList.remove('open');
+      panel.classList.remove('open');
+    };
+    panel.appendChild(b);
+  });
+  dd.classList.add('open');
+  panel.classList.add('open');
+}
+
+function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest('.auth-dd')){
+    document.querySelectorAll('.auth-dd.open').forEach(dd=>dd.classList.remove('open'));
+    document.querySelectorAll('.auth-dd-panel.open').forEach(p=>p.classList.remove('open'));
+  }
+});
+
+function showAuthOverlay(){
+  document.getElementById('authOverlay').style.display = 'flex';
+}
+function hideAuthOverlay(){
+  document.getElementById('authOverlay').style.display = 'none';
+}
+
+function registerProfile(){
+  const nama = document.getElementById('authName').value.trim();
+  const pass = document.getElementById('authPass').value;
+  const tier = authSelected.tier;
+  const num = authSelected.num;
+  if(!nama || !pass){
+    alert('Isi nama dan password dulu ya.');
+    return;
+  }
+  const profile = { nama, password: pass, tier, num };
+  localStorage.setItem('jadwalAccount', JSON.stringify(profile));
+  localStorage.setItem('jadwal_lastClass', JSON.stringify({tier,num}));
+  hideAuthOverlay();
+  applyLoggedInUI(profile);
+  selectClass(tier, num);
+}
+
+function skipAuth(){
+  hideAuthOverlay();
+  const last = getLastClass();
+  if(last) selectClass(last.tier, last.num);
+}
+
+function getLastClass(){
+  try{ return JSON.parse(localStorage.getItem('jadwal_lastClass')); }catch(e){ return null; }
+}
+
+function applyLoggedInUI(profile){
+  const badge = document.getElementById('userBadge');
+  badge.style.display = 'flex';
+  badge.innerHTML = `👋 Halo, ${profile.nama} <button onclick="switchProfile()">Bukan ${profile.nama}?</button>`;
+  currentTier = profile.tier;
+  document.querySelectorAll('.tier-btn').forEach(b=>b.classList.toggle('active', b.textContent===profile.tier));
+  renderClassGrid();
+}
+
+function switchProfile(){
+  const profile = getProfile();
+  if(!profile){ showAuthOverlay(); return; }
+  const attempt = prompt(`Masukkan password profil "${profile.nama}" untuk mengganti/menghapusnya:`);
+  if(attempt === null) return; // cancelled
+  if(attempt === profile.password){
+    localStorage.removeItem('jadwalAccount');
+    document.getElementById('userBadge').style.display = 'none';
+    document.getElementById('authName').value = '';
+    document.getElementById('authPass').value = '';
+    authSelected = { tier:'X', num:1 };
+    populateAuthNumSelect();
+    showAuthOverlay();
+  } else {
+    alert('Password salah.');
+  }
+}
+
+function initApp(){
+  populateAuthNumSelect();
+  const profile = getProfile();
+  if(profile){
+    applyLoggedInUI(profile);
+    selectClass(profile.tier, profile.num);
+  } else {
+    const last = getLastClass();
+    if(last){
+      // Guest with a remembered class — skip the modal, just restore silently.
+      selectClass(last.tier, last.num);
+    } else {
+      showAuthOverlay();
+    }
+  }
+}
+initApp();
 </script>
 </body>
 </html>
