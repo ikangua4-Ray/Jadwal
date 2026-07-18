@@ -1220,6 +1220,7 @@ const FEEDBACK_WA_NUMBER = '6287888726168';
 
 function openFeedback(){
   document.getElementById('feedbackOverlay').style.display = 'flex';
+  setTimeout(()=>document.getElementById('feedbackText').focus(), 50);
 }
 function closeFeedback(){
   document.getElementById('feedbackOverlay').style.display = 'none';
