@@ -312,6 +312,14 @@
     font-size:12px;color:var(--faint);text-decoration:underline;
   }
   .auth-error{color:#c0392b;font-size:12px;font-weight:600;margin:-4px 0 10px;}
+
+  .feedback-link{
+    border:none;background:none;cursor:pointer;font-family:inherit;
+    font-size:11.5px;color:var(--faint);text-decoration:underline;
+    padding:4px 0;
+  }
+  .feedback-link:hover{color:var(--blue);}
+  textarea.auth-input{font-family:inherit;}
   .week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
   .week-grid.today-only-mode{grid-template-columns:1fr;max-width:420px;}
   .day-col-head{
@@ -559,6 +567,9 @@
   <footer class="note">
     <strong>Catatan:</strong> Setiap Selasa, Rabu, dan Kamis pukul 07.00–07.30, guru mendampingi kegiatan sholat Dhuha dan mengaji bersama — bagi siswa Muslim di Aula dan Muslimah di Musholla; siswa non-Muslim melaksanakan kegiatan keagamaan di ruang masing-masing. Kode gabungan (misal "2.4") menandakan sesi Agama yang berjalan paralel untuk beberapa kelompok agama sekaligus.
     <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--faint);">&copy; Created by RayTheFishFR</div>
+    <div style="margin-top:8px;text-align:center;">
+      <button class="feedback-link" onclick="openFeedback()">💬 Saran &amp; Laporan Bug</button>
+    </div>
   </footer>
 
   <div id="authOverlay" class="auth-overlay" style="display:none;">
@@ -586,6 +597,16 @@
         <button class="quick-btn primary" style="width:100%;" onclick="registerProfile()">Simpan &amp; Lanjutkan</button>
       </div>
       <button class="auth-skip" onclick="skipAuth()">Lewati, langsung pakai tanpa profil</button>
+    </div>
+  </div>
+
+  <div id="feedbackOverlay" class="auth-overlay" style="display:none;">
+    <div class="auth-card">
+      <h3>Saran &amp; Laporan Bug</h3>
+      <p class="auth-note">Nemu bug, ada saran fitur, atau jadwal yang salah? Tulis di sini, nanti dikirim langsung ke WhatsApp pembuatnya.</p>
+      <textarea id="feedbackText" class="auth-input" rows="4" style="resize:vertical;" placeholder="Contoh: Jadwal Kimia kelas XI-3 hari Rabu kayaknya salah guru..."></textarea>
+      <button class="quick-btn primary" style="width:100%;margin-bottom:8px;" onclick="sendFeedback()">Kirim via WhatsApp</button>
+      <button class="auth-skip" onclick="closeFeedback()">Batal</button>
     </div>
   </div>
 </div>
@@ -933,25 +954,42 @@ function exportAsImage(){
   const target = document.getElementById('scheduleView');
   const btn = event && event.target;
   if(btn) btn.textContent = '⏳ Memproses…';
-  html2canvas(target, { backgroundColor:'#ffffff', scale:2, useCORS:true, allowTaint:true }).then(canvas=>{
-    if(btn) btn.textContent = '🖼️ Ekspor Gambar';
-    const fileName = `Jadwal-${selected.tier}-${selected.num}.png`;
-    canvas.toBlob(blob=>{
-      const file = new File([blob], fileName, {type:'image/png'});
-      if(navigator.canShare && navigator.canShare({files:[file]})){
-        navigator.share({ files:[file], title:`Jadwal ${selected.tier}-${selected.num}` }).catch(()=>{});
-      } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = fileName;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }
-    }, 'image/png');
-  }).catch(()=>{
-    if(btn) btn.textContent = '🖼️ Ekspor Gambar';
-    alert('Gagal membuat gambar. Coba lagi.');
-  });
+
+  // Make sure every card has fully finished its pop-in transition and fonts
+  // are loaded before capturing — capturing mid-transition is what caused
+  // the blurry/half-rendered export.
+  document.querySelectorAll('.card:not(.in-view)').forEach(c=>c.classList.add('in-view'));
+
+  const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+  fontsReady
+    .then(()=>new Promise(resolve=>setTimeout(resolve, 200))) // let transitions settle
+    .then(()=>html2canvas(target, {
+      backgroundColor:'#ffffff',
+      scale: Math.max(3, window.devicePixelRatio||1),
+      useCORS:true,
+      allowTaint:true,
+      imageTimeout:0
+    }))
+    .then(canvas=>{
+      if(btn) btn.textContent = '🖼️ Ekspor Gambar';
+      const fileName = `Jadwal-${selected.tier}-${selected.num}.png`;
+      canvas.toBlob(blob=>{
+        const file = new File([blob], fileName, {type:'image/png'});
+        if(navigator.canShare && navigator.canShare({files:[file]})){
+          navigator.share({ files:[file], title:`Jadwal ${selected.tier}-${selected.num}` }).catch(()=>{});
+        } else {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; a.download = fileName;
+          document.body.appendChild(a); a.click(); document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+      }, 'image/png');
+    })
+    .catch(()=>{
+      if(btn) btn.textContent = '🖼️ Ekspor Gambar';
+      alert('Gagal membuat gambar. Coba lagi.');
+    });
 }
 
 /* ---------- SCROLL POP-IN ---------- */
@@ -1175,6 +1213,27 @@ function switchProfile(){
   } else {
     alert('Password salah.');
   }
+}
+
+/* ---------- FEEDBACK / BUG REPORT ---------- */
+const FEEDBACK_WA_NUMBER = '6287888726168';
+
+function openFeedback(){
+  document.getElementById('feedbackOverlay').style.display = 'flex';
+}
+function closeFeedback(){
+  document.getElementById('feedbackOverlay').style.display = 'none';
+  document.getElementById('feedbackText').value = '';
+}
+function sendFeedback(){
+  const text = document.getElementById('feedbackText').value.trim();
+  if(!text){ alert('Tulis dulu saran atau bug-nya ya.'); return; }
+  const profile = getProfile();
+  const who = profile ? `${profile.nama} (${profile.tier}-${profile.num})` : 'Pengguna JadwalKelas';
+  const message = `Halo, ada masukan buat JadwalKelas:\n\n${text}\n\n— dari: ${who}`;
+  const url = `https://wa.me/${FEEDBACK_WA_NUMBER}?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank');
+  closeFeedback();
 }
 
 function initApp(){
