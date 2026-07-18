@@ -302,7 +302,12 @@
     body{background:#fff;padding:0;}
     .deco,.topbar,.tabbar,.sidebar,.rightpanel,footer.note{display:none !important;}
     .app-shell{box-shadow:none;border-radius:0;}
-    .card{animation:none;opacity:1;transform:none;}
+    .card{
+      animation:none;opacity:1;transform:none;
+      break-inside:avoid;page-break-inside:avoid;
+    }
+    .day-col-head{break-after:avoid;page-break-after:avoid;}
+    .week-grid{grid-template-columns:repeat(2,1fr);}
   }
 </style>
 </head>
