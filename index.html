@@ -237,6 +237,29 @@
   .mini-action:hover{border-color:var(--blue);background:#f7f9ff;}
   .mini-action.active{background:var(--blue);border-color:var(--blue);color:#fff;}
 
+  .day-filter-dd{position:relative;}
+  .day-filter-dd .chev{font-size:10px;color:var(--faint);margin-left:2px;}
+  .day-filter-dd.open .mini-action{
+    border-color:var(--blue);
+    animation:ddGlow 1.7s ease-in-out infinite;
+  }
+  .day-filter-panel{
+    position:absolute;top:calc(100% + 6px);left:0;z-index:8;min-width:190px;
+    background:#fff;border:1px solid var(--line);border-radius:12px;
+    box-shadow:0 14px 34px rgba(5,8,30,.18);
+    padding:6px;display:none;
+  }
+  .day-filter-panel.open{display:block;}
+  .day-filter-option{
+    display:block;width:100%;text-align:left;border:none;background:none;
+    padding:9px 12px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;color:var(--ink);
+    cursor:pointer;
+    opacity:0;transform:translateY(-10px);
+    animation:classBtnIn .35s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  .day-filter-option:hover{background:#f4f5fb;}
+  .day-filter-option.reset{color:var(--muted);border-top:1px solid var(--line);margin-top:4px;padding-top:10px;}
+
   .user-badge{
     display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--ink);
     background:#f4f5fb;padding:6px 12px;border-radius:20px;white-space:nowrap;
@@ -321,7 +344,6 @@
   .feedback-link:hover{color:var(--blue);}
   textarea.auth-input{font-family:inherit;}
   .week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
-  .week-grid.today-only-mode{grid-template-columns:1fr;max-width:420px;}
   .day-col-head{
     font-size:15px;font-weight:800;color:var(--ink);text-align:center;
     letter-spacing:.01em;
@@ -409,19 +431,21 @@
 
   @media print{
     body{background:#fff;padding:0;}
-    .deco,.topbar,.tabbar,.sidebar,.rightpanel,footer.note{display:none !important;}
+    .deco,.topbar,.tabbar,.sidebar,.rightpanel,footer.note,.main-head-actions,#userBadge{display:none !important;}
     .app-shell{box-shadow:none;border-radius:0;}
     .card{
-      animation:none;opacity:1;transform:none;
+      animation:none !important;opacity:1 !important;transform:none !important;
       break-inside:avoid;page-break-inside:avoid;
       margin-bottom:10px;
     }
     .day-col-head{break-after:avoid;page-break-after:avoid;margin-bottom:14px;}
     /* Grid columns paginate unreliably in Chrome's print engine
-       (can duplicate/cut content across pages) — stack days instead. */
-    .week-grid{display:block;}
+       (can duplicate/cut content across pages) — stack days instead.
+       !important guards against the responsive breakpoint rules above,
+       since some mobile "Save as PDF" renderers evaluate both. */
+    .week-grid{display:block !important;}
     .day-col-wrap{
-      display:block;width:100%;
+      display:block !important;width:100% !important;
       margin-bottom:36px;
       page-break-before:always;break-before:page;
     }
@@ -534,6 +558,10 @@
           </div>
           <div class="main-head-actions">
             <button class="mini-action" id="todayOnlyBtn" onclick="toggleTodayOnly()">📅 Hari Ini Saja</button>
+            <div class="day-filter-dd" id="dayFilterDD">
+              <button class="mini-action" onclick="toggleDayFilterDD()">📆 Pilih Hari <span class="chev">▾</span></button>
+              <div class="day-filter-panel" id="dayFilterPanel"></div>
+            </div>
             <button class="mini-action" onclick="exportAsImage()">🖼️ Ekspor Gambar</button>
           </div>
         </div>
@@ -913,7 +941,7 @@ function renderSchedule(tier,num){
   document.getElementById('infoSessions').textContent = totalSessions;
   applyFilter();
   observePopIn();
-  applyTodayOnlyFilter();
+  applyDayFilter();
 
   // Safety net: if scroll-based reveal doesn't fire (some embedded viewers
   // don't report intersection correctly), force cards visible anyway.
@@ -922,27 +950,78 @@ function renderSchedule(tier,num){
   }, 900);
 }
 
-/* ---------- TODAY-ONLY MODE ---------- */
-let todayOnlyActive = false;
+/* ---------- DAY FILTER (today-only shortcut + manual day picker) ---------- */
+let selectedDays = new Set(); // empty = show all days
+
 function toggleTodayOnly(){
-  todayOnlyActive = !todayOnlyActive;
-  document.getElementById('todayOnlyBtn').classList.toggle('active', todayOnlyActive);
-  applyTodayOnlyFilter();
-}
-function applyTodayOnlyFilter(){
-  const grid = document.getElementById('weekGrid');
   const isSchoolDay = ['Senin','Selasa','Rabu','Kamis','Jumat'].includes(todayName);
-  if(todayOnlyActive && !isSchoolDay){
-    alert('Hari ini bukan hari sekolah (Sabtu/Minggu), jadi mode "Hari Ini" belum bisa menampilkan apa-apa. Menampilkan jadwal seminggu penuh saja.');
-    todayOnlyActive = false;
-    document.getElementById('todayOnlyBtn').classList.remove('active');
+  if(!isSchoolDay){
+    alert('Hari ini bukan hari sekolah (Sabtu/Minggu), jadi mode "Hari Ini" belum bisa menampilkan apa-apa.');
+    return;
   }
-  grid.classList.toggle('today-only-mode', todayOnlyActive);
-  document.querySelectorAll('.day-col-wrap').forEach(col=>{
-    const match = col.dataset.day === todayName;
-    col.style.display = (todayOnlyActive && !match) ? 'none' : '';
-  });
+  const alreadyTodayOnly = selectedDays.size===1 && selectedDays.has(todayName);
+  selectedDays = alreadyTodayOnly ? new Set() : new Set([todayName]);
+  applyDayFilter();
 }
+
+function toggleDayFilterDD(){
+  const dd = document.getElementById('dayFilterDD');
+  const panel = document.getElementById('dayFilterPanel');
+  const isOpen = panel.classList.contains('open');
+  if(isOpen){ dd.classList.remove('open'); panel.classList.remove('open'); return; }
+  renderDayFilterPanel();
+  dd.classList.add('open'); panel.classList.add('open');
+}
+
+function renderDayFilterPanel(){
+  const panel = document.getElementById('dayFilterPanel');
+  panel.innerHTML = '';
+  const days = Object.keys(schedule);
+  days.forEach((day,i)=>{
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'day-filter-option';
+    b.style.animationDelay = (i*0.05)+'s';
+    b.innerHTML = `${selectedDays.has(day) ? '✅' : '⬜'} ${day}`;
+    b.onclick = (e)=>{
+      e.stopPropagation();
+      if(selectedDays.has(day)) selectedDays.delete(day); else selectedDays.add(day);
+      renderDayFilterPanel();
+      applyDayFilter();
+    };
+    panel.appendChild(b);
+  });
+  const reset = document.createElement('button');
+  reset.type = 'button';
+  reset.className = 'day-filter-option reset';
+  reset.style.animationDelay = (days.length*0.05)+'s';
+  reset.textContent = '↺ Tampilkan semua hari';
+  reset.onclick = (e)=>{ e.stopPropagation(); selectedDays.clear(); renderDayFilterPanel(); applyDayFilter(); };
+  panel.appendChild(reset);
+}
+
+function applyDayFilter(){
+  const grid = document.getElementById('weekGrid');
+  const count = selectedDays.size || Object.keys(schedule).length;
+  grid.style.gridTemplateColumns = selectedDays.size ? `repeat(${count}, 1fr)` : '';
+  grid.style.maxWidth = (selectedDays.size && count<=2) ? (count*380)+'px' : '';
+
+  document.querySelectorAll('.day-col-wrap').forEach(col=>{
+    const show = selectedDays.size===0 || selectedDays.has(col.dataset.day);
+    col.style.display = show ? '' : 'none';
+  });
+
+  document.getElementById('todayOnlyBtn').classList.toggle(
+    'active', selectedDays.size===1 && selectedDays.has(todayName)
+  );
+}
+
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest('.day-filter-dd')){
+    document.getElementById('dayFilterDD').classList.remove('open');
+    document.getElementById('dayFilterPanel').classList.remove('open');
+  }
+});
 
 /* ---------- EXPORT AS IMAGE ---------- */
 function exportAsImage(){
@@ -976,6 +1055,7 @@ function exportAsImage(){
       canvas.toBlob(blob=>{
         const file = new File([blob], fileName, {type:'image/png'});
         if(navigator.canShare && navigator.canShare({files:[file]})){
+          alert('Gambar sudah dibuat dalam resolusi tinggi. Catatan: kalau dikirim lewat WhatsApp sebagai "Foto", WhatsApp otomatis mengompres dan bisa jadi agak blur — kalau mau kualitas full, pilih kirim sebagai "Dokumen" di WhatsApp.');
           navigator.share({ files:[file], title:`Jadwal ${selected.tier}-${selected.num}` }).catch(()=>{});
         } else {
           const url = URL.createObjectURL(blob);
