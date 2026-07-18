@@ -439,17 +439,25 @@
       margin-bottom:10px;
     }
     .day-col-head{break-after:avoid;page-break-after:avoid;margin-bottom:14px;}
-    /* Grid columns paginate unreliably in Chrome's print engine
-       (can duplicate/cut content across pages) — stack days instead.
-       !important guards against the responsive breakpoint rules above,
-       since some mobile "Save as PDF" renderers evaluate both. */
+
+    /* Two days side-by-side per page. CSS Grid fragments unpredictably
+       across print pages in Chrome (causes duplicated/cut content), so
+       pairs of days use inline-block instead — a layout method print
+       engines handle far more predictably. */
     .week-grid{display:block !important;}
     .day-col-wrap{
-      display:block !important;width:100% !important;
-      margin-bottom:36px;
+      display:inline-block !important;
+      width:48% !important;
+      vertical-align:top;
+      margin-right:3%;
+      margin-bottom:20px;
+    }
+    .day-col-wrap:nth-child(even){margin-right:0 !important;}
+    .day-col-wrap:nth-child(3), .day-col-wrap:nth-child(5){
       page-break-before:always;break-before:page;
     }
     .day-col-wrap:first-child{page-break-before:auto;break-before:auto;}
+    .day-col-wrap:nth-child(5){width:100% !important;} /* Jumat is alone — use full width */
   }
 </style>
 </head>
