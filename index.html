@@ -335,6 +335,7 @@
     font-size:12px;color:var(--faint);text-decoration:underline;
   }
   .auth-error{color:#c0392b;font-size:12px;font-weight:600;margin:-4px 0 10px;}
+  #qrOverlay{align-items:flex-start;padding-top:36px;}
 
   .feedback-link{
     border:none;background:none;cursor:pointer;font-family:inherit;
@@ -386,6 +387,86 @@
     padding:70px 20px;text-align:center;color:var(--faint);font-size:14px;font-weight:500;
   }
 
+  /* LIVE STATUS */
+  .live-status{
+    display:inline-flex;align-items:center;gap:6px;margin-top:8px;
+    font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;
+    background:#eef2ff;color:var(--blue);
+  }
+  .live-status .dot{width:7px;height:7px;border-radius:50%;background:var(--blue);animation:liveDotPulse 1.4s ease-in-out infinite;}
+  @keyframes liveDotPulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+  .live-status.break-mode{background:#f4f5fb;color:var(--muted);}
+  .live-status.break-mode .dot{background:var(--muted);}
+  .live-status.done-mode{background:#eafbf1;color:#12784f;}
+  .live-status.done-mode .dot{background:#12784f;animation:none;}
+
+  .card.live-now{
+    box-shadow:0 0 0 2px var(--blue), 0 0 18px rgba(59,109,240,.45) !important;
+    animation-name:cardLivePulse;
+    animation-duration:2s;
+    animation-iteration-count:infinite;
+  }
+  @keyframes cardLivePulse{
+    0%,100%{box-shadow:0 0 0 2px var(--blue), 0 0 14px rgba(59,109,240,.35);}
+    50%{box-shadow:0 0 0 3px var(--blue), 0 0 26px rgba(59,109,240,.6);}
+  }
+  .card.live-now .live-badge{
+    display:inline-block;font-size:9.5px;font-weight:800;background:var(--blue);color:#fff;
+    padding:2px 7px;border-radius:20px;margin-bottom:4px;
+  }
+
+  /* STATS */
+  .stats-bar-row{margin-bottom:14px;}
+  .stats-bar-label{
+    display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:5px;
+  }
+  .stats-bar-label span:last-child{color:var(--muted);font-weight:600;}
+  .stats-bar-track{background:var(--ash);border-radius:20px;height:12px;overflow:hidden;}
+  .stats-bar-fill{
+    height:100%;border-radius:20px;width:0;
+    transition:width .8s cubic-bezier(.22,1,.36,1);
+  }
+
+  /* DARK MODE */
+  body.dark-mode{--ash-dark:#1c1e38;}
+  body.dark-mode .app-shell{background:#14162a;}
+  body.dark-mode,
+  body.dark-mode .main-head h2,
+  body.dark-mode .day-col-head,
+  body.dark-mode .name,
+  body.dark-mode .stats-bar-label,
+  body.dark-mode .auth-card h3,
+  body.dark-mode .result-head .name{color:#eef0fa;}
+  body.dark-mode .topbar,body.dark-mode .tabbar,body.dark-mode .sidebar,body.dark-mode .rightpanel{
+    border-color:#2a2e4d;
+  }
+  body.dark-mode .logo{color:#eef0fa;}
+  body.dark-mode .search,body.dark-mode .icon-btn,body.dark-mode .mini-action,
+  body.dark-mode .class-btn,body.dark-mode .tier-toggle,body.dark-mode .chip,
+  body.dark-mode .side-nav-item:hover,body.dark-mode .auth-dd-btn,
+  body.dark-mode .mini-search,body.dark-mode .auth-input,body.dark-mode textarea.auth-input,
+  body.dark-mode .quick-btn,body.dark-mode .info-card,body.dark-mode .stats-bar-track,
+  body.dark-mode .day-filter-panel,body.dark-mode .auth-dd-panel,body.dark-mode .legend-table td{
+    background:#1c1e38;border-color:#2f3358;color:#dfe1f5;
+  }
+  body.dark-mode .auth-card,body.dark-mode .guru-detail{background:#1c1e38;}
+  body.dark-mode .day-filter-option,body.dark-mode .auth-dd-option,body.dark-mode .quick-link,
+  body.dark-mode .setting-row,body.dark-mode .tier-btn,body.dark-mode .side-nav-item{
+    color:#dfe1f5;
+  }
+  body.dark-mode .side-nav-item.active{background:#28306b;color:#9cb6ff;}
+  body.dark-mode .tier-btn.active{background:#2f3767;color:#eef0fa;box-shadow:none;}
+  body.dark-mode .sub,body.dark-mode .subjects .subj-badge,body.dark-mode .teacher,
+  body.dark-mode .time,body.dark-mode .who,body.dark-mode .auth-note,body.dark-mode footer.note,
+  body.dark-mode .empty-state,body.dark-mode .tier-label{color:#9498c2;}
+  body.dark-mode .day-col-head,body.dark-mode .slot,body.dark-mode .card:not([style*="background"]){
+    border-color:#2a2e4d;
+  }
+  body.dark-mode .userBadge,body.dark-mode .user-badge{background:#1c1e38;color:#dfe1f5;}
+  body.dark-mode .legend-table th{color:#7c81a3;}
+  body.dark-mode .legend-code,body.dark-mode .code-tag{background:#262a4d;color:#c3c7ea;}
+  body.dark-mode .auth-overlay{background:rgba(0,0,2,.7);}
+
   /* LEGEND VIEW */
   .legend-view{display:none;padding:6px 2px 20px;}
   .legend-view.show{display:block;}
@@ -431,7 +512,11 @@
 
   @media print{
     body{background:#fff;padding:0;}
-    .deco,.topbar,.tabbar,.sidebar,.rightpanel,footer.note,.main-head-actions,#userBadge{display:none !important;}
+    .deco,.topbar,.tabbar,.sidebar,.rightpanel,footer.note,.main-head-actions,#userBadge,.live-status,
+    .auth-overlay:not(#qrOverlay){display:none !important;}
+    #qrOverlay{position:static !important;background:none !important;padding:0 !important;}
+    #qrOverlay .auth-card{box-shadow:none;text-align:center;}
+    #qrOverlay .auth-skip,#qrOverlay .quick-btn{display:none !important;}
     .app-shell{box-shadow:none;border-radius:0;}
     .card{
       animation:none !important;opacity:1 !important;transform:none !important;
@@ -478,6 +563,11 @@
     </div>
     <div class="topbar-right">
       <div id="userBadge" class="user-badge" style="display:none;"></div>
+      <button class="icon-btn" title="Perkecil teks" onclick="adjustTextScale(-0.1)">A−</button>
+      <button class="icon-btn" title="Perbesar teks" onclick="adjustTextScale(0.1)">A+</button>
+      <button class="icon-btn" id="darkModeBtn" title="Mode gelap" onclick="toggleDarkMode()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
       <button class="icon-btn" title="Cetak jadwal" onclick="window.print()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
       </button>
@@ -492,6 +582,10 @@
     <button class="tab" id="tabLegend" onclick="switchTab('legend')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       Legenda Kode
+    </button>
+    <button class="tab" id="tabStats" onclick="switchTab('stats')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px;"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Statistik
     </button>
   </div>
 
@@ -524,6 +618,7 @@
           <h3>Aksi Cepat</h3>
           <button class="quick-link" onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
           <button class="quick-link" onclick="switchTab('legend')">📖 Lihat Legenda Kode</button>
+          <button class="quick-link" onclick="openQr()">📌 QR Kelas Ini</button>
         </div>
       </div>
 
@@ -563,6 +658,7 @@
           <div>
             <h2>Jadwal Mingguan</h2>
             <div class="sub">Semester 1 · Tahun Ajaran 2026/2027</div>
+            <div id="liveStatus" class="live-status" style="display:none;"></div>
           </div>
           <div class="main-head-actions">
             <button class="mini-action" id="todayOnlyBtn" onclick="toggleTodayOnly()">📅 Hari Ini Saja</button>
@@ -584,6 +680,11 @@
           <tbody id="legendBody"></tbody>
         </table>
       </div>
+
+      <div id="statsView" class="legend-view">
+        <div class="main-head"><h2 id="statsTitle">Statistik Jam Mengajar</h2></div>
+        <div id="statsBody"></div>
+      </div>
     </div>
 
     <div class="rightpanel">
@@ -597,6 +698,7 @@
       <h3>Aksi</h3>
       <button class="quick-btn primary" onclick="window.print()">Cetak Jadwal</button>
       <button class="quick-btn" onclick="switchTab('legend')">Lihat Legenda</button>
+      <button class="quick-btn" onclick="openQr()">📌 QR Kelas Ini</button>
     </div>
   </div>
 
@@ -645,9 +747,21 @@
       <button class="auth-skip" onclick="closeFeedback()">Batal</button>
     </div>
   </div>
+
+  <div id="qrOverlay" class="auth-overlay" style="display:none;">
+    <div class="auth-card" style="text-align:center;">
+      <h3 id="qrTitle">QR Kelas</h3>
+      <p class="auth-note">Scan kode ini buat langsung buka jadwal kelas ini di HP. Cocok ditempel di pintu kelas.</p>
+      <img id="qrImage" src="" alt="QR jadwal kelas" style="width:220px;height:220px;border-radius:12px;border:1px solid var(--line);margin-bottom:14px;">
+      <button class="quick-btn primary" style="width:100%;margin-bottom:8px;" onclick="window.print()">Cetak</button>
+      <button class="auth-skip" onclick="closeQr()">Tutup</button>
+    </div>
+  </div>
 </div>
 
 <script>
+if(localStorage.getItem('jadwal_darkMode')==='1'){ document.body.classList.add('dark-mode'); }
+
 /* ---------- DATA ---------- */
 const teachers = {
 1:["Budiriyanto, M.Pd.","Kepsek"],
@@ -936,6 +1050,7 @@ function renderSchedule(tier,num){
         card.style.background = info.color.bg;
         card.style.color = info.color.fg;
         card.dataset.subj = (info.name+' '+info.guru).toLowerCase();
+        card.dataset.key = day+'|'+item.t;
         card.innerHTML = `<div class="time">${item.t}</div><div class="subj">${info.name||'—'}</div><div class="who">${info.guru||''}</div>`;
       }
       body.appendChild(card);
@@ -950,6 +1065,7 @@ function renderSchedule(tier,num){
   applyFilter();
   observePopIn();
   applyDayFilter();
+  updateLiveStatus();
 
   // Safety net: if scroll-based reveal doesn't fire (some embedded viewers
   // don't report intersection correctly), force cards visible anyway.
@@ -1031,6 +1147,123 @@ document.addEventListener('click', (e)=>{
   }
 });
 
+/* ---------- TIME HELPER ---------- */
+function parseTimeRange(t){
+  const [startStr, endStr] = t.split('–').map(s=>s.trim());
+  const toMin = (s)=>{ const [h,m] = s.split('.').map(Number); return h*60+m; };
+  return { start: toMin(startStr), end: toMin(endStr) };
+}
+
+/* ---------- LIVE STATUS / COUNTDOWN ---------- */
+function updateLiveStatus(){
+  const pill = document.getElementById('liveStatus');
+  document.querySelectorAll('.card.live-now').forEach(c=>{
+    c.classList.remove('live-now');
+    const badge = c.querySelector('.live-badge');
+    if(badge) badge.remove();
+  });
+
+  if(!selected){ pill.style.display='none'; return; }
+
+  const isSchoolDay = ['Senin','Selasa','Rabu','Kamis','Jumat'].includes(todayName);
+  if(!isSchoolDay){ pill.style.display='none'; return; }
+
+  const now = new Date();
+  const cur = now.getHours()*60 + now.getMinutes();
+  const items = schedule[todayName];
+  let matched = false;
+
+  for(let i=0;i<items.length;i++){
+    const item = items[i];
+    const {start,end} = parseTimeRange(item.t);
+    if(cur>=start && cur<end){
+      matched = true;
+      const leftMin = end - cur;
+      if(item.b){
+        pill.className = 'live-status break-mode';
+        pill.innerHTML = `<span class="dot"></span>${item.l} — lanjut pelajaran dalam ${leftMin} menit`;
+      } else {
+        const idx = colIndex(selected.tier, selected.num);
+        const info = resolveCode(item.c[idx]);
+        pill.className = 'live-status';
+        pill.innerHTML = `<span class="dot"></span>Sedang: ${info.name} — berakhir dalam ${leftMin} menit`;
+        const key = todayName+'|'+item.t;
+        const cardEl = document.querySelector(`.card[data-key="${CSS.escape(key)}"]`);
+        if(cardEl){
+          const badge = document.createElement('div');
+          badge.className = 'live-badge';
+          badge.textContent = '🔴 Sedang berlangsung';
+          cardEl.insertBefore(badge, cardEl.firstChild);
+          cardEl.classList.add('live-now');
+        }
+      }
+      break;
+    }
+  }
+
+  if(!matched){
+    const first = parseTimeRange(items[0].t);
+    const last = parseTimeRange(items[items.length-1].t);
+    if(cur < first.start){
+      pill.className = 'live-status break-mode';
+      pill.innerHTML = `<span class="dot"></span>Belum mulai — dimulai dalam ${first.start-cur} menit`;
+    } else if(cur >= last.end){
+      pill.className = 'live-status done-mode';
+      pill.innerHTML = `<span class="dot"></span>Jadwal hari ini sudah selesai`;
+    } else {
+      pill.className = 'live-status break-mode';
+      pill.innerHTML = `<span class="dot"></span>Jeda`;
+    }
+  }
+  pill.style.display = 'inline-flex';
+}
+setInterval(updateLiveStatus, 30000);
+
+/* ---------- STATS ---------- */
+function renderStats(){
+  const body = document.getElementById('statsBody');
+  if(!selected){
+    document.getElementById('statsTitle').textContent = 'Statistik Jam Mengajar';
+    body.innerHTML = '<div class="empty-state">Pilih kelas dulu buat lihat statistiknya.</div>';
+    return;
+  }
+  document.getElementById('statsTitle').textContent = `Statistik Jam Mengajar — ${selected.tier}-${selected.num}`;
+  const idx = colIndex(selected.tier, selected.num);
+  const totals = {};
+  const colors = {};
+
+  Object.keys(schedule).forEach(day=>{
+    schedule[day].forEach(item=>{
+      if(item.b) return;
+      const info = resolveCode(item.c[idx]);
+      const {start,end} = parseTimeRange(item.t);
+      const mins = Math.max(0, end-start);
+      const key = info.name || '—';
+      totals[key] = (totals[key]||0) + mins;
+      colors[key] = info.color;
+    });
+  });
+
+  const entries = Object.entries(totals).sort((a,b)=>b[1]-a[1]);
+  body.innerHTML = '';
+  if(!entries.length){
+    body.innerHTML = '<div class="empty-state">Belum ada data.</div>';
+    return;
+  }
+  const max = entries[0][1];
+  entries.forEach(([name,mins],i)=>{
+    const jam = mins/60;
+    const jamText = (jam % 1 === 0) ? `${jam} jam` : `${jam.toFixed(1)} jam`;
+    const row = document.createElement('div');
+    row.className = 'stats-bar-row';
+    row.innerHTML = `<div class="stats-bar-label"><span>${name}</span><span>${jamText}</span></div>
+      <div class="stats-bar-track"><div class="stats-bar-fill" style="background:${colors[name].fg};"></div></div>`;
+    body.appendChild(row);
+    const fillEl = row.querySelector('.stats-bar-fill');
+    setTimeout(()=>{ fillEl.style.width = (mins/max*100)+'%'; }, 50 + i*40);
+  });
+}
+
 /* ---------- EXPORT AS IMAGE ---------- */
 function exportAsImage(){
   if(!selected){ alert('Pilih kelas dulu sebelum ekspor gambar.'); return; }
@@ -1110,8 +1343,11 @@ document.getElementById('searchBox').addEventListener('input', applyFilter);
 function switchTab(tab){
   document.getElementById('tabSchedule').classList.toggle('active', tab==='schedule');
   document.getElementById('tabLegend').classList.toggle('active', tab==='legend');
+  document.getElementById('tabStats').classList.toggle('active', tab==='stats');
   document.getElementById('scheduleView').style.display = tab==='schedule' ? 'block' : 'none';
   document.getElementById('legendView').classList.toggle('show', tab==='legend');
+  document.getElementById('statsView').classList.toggle('show', tab==='stats');
+  if(tab==='stats') renderStats();
 }
 
 /* ---------- LEGEND ---------- */
@@ -1179,6 +1415,12 @@ function toggleGuruDetail(id){
 }
 
 /* ---------- SIDEBAR: SETTINGS ---------- */
+/* ---------- DARK MODE ---------- */
+function toggleDarkMode(){
+  document.body.classList.toggle('dark-mode');
+  localStorage.setItem('jadwal_darkMode', document.body.classList.contains('dark-mode') ? '1' : '0');
+}
+
 function applySettings(){
   const hideBreaks = document.getElementById('toggleHideBreaks').checked;
   const showCodes = document.getElementById('toggleShowCodes').checked;
@@ -1325,8 +1567,58 @@ function sendFeedback(){
   closeFeedback();
 }
 
+/* ---------- QR CODE PER KELAS ---------- */
+function openQr(){
+  if(!selected){ alert('Pilih kelas dulu sebelum bikin QR-nya.'); return; }
+  const label = `${selected.tier}-${selected.num}`;
+  const url = new URL(location.href);
+  url.search = '';
+  url.searchParams.set('kelas', label);
+  const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url.toString())}`;
+  document.getElementById('qrTitle').textContent = `QR Kelas ${label}`;
+  document.getElementById('qrImage').src = qrApi;
+  document.getElementById('qrOverlay').style.display = 'flex';
+}
+function closeQr(){
+  document.getElementById('qrOverlay').style.display = 'none';
+}
+
+/* ---------- TEXT SIZE ---------- */
+let textScale = parseFloat(localStorage.getItem('jadwal_textScale')) || 1;
+function applyTextScale(){
+  const shell = document.querySelector('.app-shell');
+  if(shell) shell.style.zoom = textScale;
+}
+function adjustTextScale(delta){
+  textScale = Math.min(1.4, Math.max(0.8, +(textScale + delta).toFixed(2)));
+  localStorage.setItem('jadwal_textScale', textScale);
+  applyTextScale();
+}
+
+function getKelasFromUrl(){
+  const param = new URLSearchParams(location.search).get('kelas');
+  if(!param) return null;
+  const m = param.match(/^(X|XI|XII)-(\d)$/i);
+  if(!m) return null;
+  const tier = m[1].toUpperCase();
+  const num = parseInt(m[2], 10);
+  if(num<1 || num>8) return null;
+  return { tier, num };
+}
+
 function initApp(){
   populateAuthNumSelect();
+  applyTextScale();
+
+  const fromUrl = getKelasFromUrl();
+  if(fromUrl){
+    // Opened via a QR code / shared link — jump straight to that class.
+    const profile = getProfile();
+    if(profile) applyLoggedInUI(profile);
+    selectClass(fromUrl.tier, fromUrl.num);
+    return;
+  }
+
   const profile = getProfile();
   if(profile){
     applyLoggedInUI(profile);
