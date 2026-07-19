@@ -192,9 +192,13 @@
   .side-panel.panel-enter{animation:panelIn 1s cubic-bezier(.22,1,.36,1) both;}
 
   /* TABS */
-  .tabbar{display:flex;gap:6px;padding:0 28px;border-bottom:1px solid var(--line);}
+  .tabbar{
+    display:flex;gap:6px;padding:0 28px;border-bottom:1px solid var(--line);
+    overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  }
+  .tabbar::-webkit-scrollbar{display:none;}
   .tab{
-    border:none;background:none;cursor:pointer;
+    border:none;background:none;cursor:pointer;flex-shrink:0;white-space:nowrap;
     font-family:inherit;font-size:13.5px;font-weight:600;color:var(--muted);
     padding:14px 6px;margin-right:22px;position:relative;
     transition:color .15s ease;
@@ -699,6 +703,7 @@
           <button class="quick-link" onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
           <button class="quick-link" onclick="switchTab('legend')">📖 Lihat Legenda Kode</button>
           <button class="quick-link" onclick="openQr()">📌 QR Kelas Ini</button>
+          <button class="quick-link" onclick="sendToWhatsapp()">💬 Kirim ke WhatsApp</button>
         </div>
       </div>
 
@@ -751,6 +756,7 @@
               <div class="day-filter-panel" id="dayFilterPanel"></div>
             </div>
             <button class="mini-action" onclick="exportAsImage()">🖼️ Ekspor Gambar</button>
+            <button class="mini-action" onclick="sendToWhatsapp()">💬 Kirim ke WhatsApp</button>
           </div>
         </div>
         <div id="weekGrid" class="week-grid" style="display:none;"></div>
@@ -799,6 +805,7 @@
       <button class="quick-btn primary" onclick="window.print()">Cetak Jadwal</button>
       <button class="quick-btn" onclick="switchTab('legend')">Lihat Legenda</button>
       <button class="quick-btn" onclick="openQr()">📌 QR Kelas Ini</button>
+      <button class="quick-btn" onclick="sendToWhatsapp()">💬 Kirim ke WhatsApp</button>
     </div>
   </div>
 
@@ -1862,6 +1869,36 @@ function sendFeedback(){
 }
 
 /* ---------- QR CODE PER KELAS ---------- */
+/* ---------- SEND SCHEDULE TO WHATSAPP (TEXT) ---------- */
+function formatScheduleForWhatsapp(){
+  const idx = colIndex(selected.tier, selected.num);
+  let text = `📅 *Jadwal Pelajaran Kelas ${selected.tier}-${selected.num}*\n`;
+  text += `_SMAS Yayasan Pupuk Kaltim · Semester 1, Tahun Ajaran 2026/2027_\n\n`;
+
+  Object.keys(schedule).forEach(day=>{
+    text += `*${day}*\n`;
+    schedule[day].forEach(item=>{
+      if(item.b){
+        text += `${item.t}  ${item.l}\n`;
+      } else {
+        const info = resolveCode(item.c[idx]);
+        text += `${item.t}  ${info.name}${info.guru ? ' — '+info.guru : ''}\n`;
+      }
+    });
+    text += `\n`;
+  });
+
+  text += `_Dibuat otomatis lewat JadwalKelas_`;
+  return text;
+}
+
+function sendToWhatsapp(){
+  if(!selected){ alert('Pilih kelas dulu sebelum kirim ke WhatsApp.'); return; }
+  const text = formatScheduleForWhatsapp();
+  const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+}
+
 function openQr(){
   if(!selected){ alert('Pilih kelas dulu sebelum bikin QR-nya.'); return; }
   const label = `${selected.tier}-${selected.num}`;
