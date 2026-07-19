@@ -379,8 +379,11 @@
   .auth-dd-option:hover{background:#f4f5fb;}
   .auth-dd-option.selected{background:var(--blue);color:#fff;}
   .auth-select{
-    flex:1;border:1px solid var(--line);border-radius:10px;padding:11px 8px;
+    flex:1;border:1px solid var(--line);border-radius:10px;padding:11px 30px 11px 8px;
     font-family:inherit;font-size:13px;color:var(--ink);background:#fff;
+    -webkit-appearance:none;appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235C5E62' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 8px center;background-size:16px;
   }
   .auth-skip{
     display:block;width:100%;text-align:center;margin-top:14px;
@@ -524,6 +527,14 @@
   body.dark-mode .legend-table th{color:#7c81a3;}
   body.dark-mode .legend-code,body.dark-mode .code-tag{background:#262a4d;color:#c3c7ea;}
   body.dark-mode .card.brk{background:#1c1e38;color:#9498c2;border-color:#33375c;}
+  body.dark-mode .auth-select{
+    background-color:#1c1e38 !important;border-color:#2f3358;color:#dfe1f5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239498c2' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  }
+  body.dark-mode .compare-cell.brk,body.dark-mode .compare-head-col{
+    background:#1c1e38;color:#9498c2;
+  }
+  body.dark-mode .compare-day-head{color:#eef0fa;}
   body.dark-mode .auth-overlay{background:rgba(0,0,2,.7);}
 
   /* LEGEND VIEW */
@@ -714,7 +725,7 @@
           <input type="checkbox" id="toggleShowCodes" checked onchange="applySettings()">
         </label>
         <label class="setting-row">
-          <span>Notifikasi 5 menit sebelum kelas mulai</span>
+          <span>Notifikasi 5 menit sebelum kelas mulai (setelah istirahat/isoma)</span>
           <input type="checkbox" id="toggleNotif" onchange="toggleNotifSetting()">
         </label>
         <div class="quick">
@@ -1391,8 +1402,15 @@ function checkClassReminder(items, cur, day){
   if(!('Notification' in window) || Notification.permission !== 'granted') return;
   if(!selected) return;
 
-  const upcoming = items.find(item => !item.b && parseTimeRange(item.t).start > cur);
-  if(!upcoming) return;
+  const upcomingIdx = items.findIndex(item => !item.b && parseTimeRange(item.t).start > cur);
+  if(upcomingIdx === -1) return;
+  const upcoming = items[upcomingIdx];
+
+  // Only notify for classes starting right after Istirahat/Isoma — not every
+  // routine period change.
+  const prev = items[upcomingIdx - 1];
+  const followsBreak = prev && prev.b && (prev.l === 'Istirahat' || prev.l === 'Isoma');
+  if(!followsBreak) return;
 
   const minutesLeft = parseTimeRange(upcoming.t).start - cur;
   const key = day + '|' + upcoming.t;
