@@ -88,7 +88,7 @@
     font-family:inherit;font-size:13px;color:var(--ink);
   }
   .search svg{flex-shrink:0;}
-  .topbar-right{display:flex;align-items:center;gap:14px;}
+  .topbar-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end;}
   .icon-btn{
     width:36px;height:36px;border-radius:10px;background:#f4f5fb;
     display:flex;align-items:center;justify-content:center;
@@ -263,7 +263,10 @@
   .user-badge{
     display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--ink);
     background:#f4f5fb;padding:6px 12px;border-radius:20px;white-space:nowrap;
+    max-width:240px;overflow:hidden;
   }
+  .user-badge .name-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px;}
+  .user-badge button{flex-shrink:0;}
   .user-badge button{
     border:none;background:none;cursor:pointer;font-size:11px;color:var(--muted);
     font-weight:700;text-decoration:underline;font-family:inherit;
@@ -1521,7 +1524,8 @@ function getLastClass(){
 function applyLoggedInUI(profile){
   const badge = document.getElementById('userBadge');
   badge.style.display = 'flex';
-  badge.innerHTML = `👋 Halo, ${profile.nama} <button onclick="switchProfile()">Bukan ${profile.nama}?</button>`;
+  badge.title = profile.nama;
+  badge.innerHTML = `👋 <span class="name-txt">${profile.nama}</span> <button onclick="switchProfile()" title="Bukan ${profile.nama}?">Ganti</button>`;
   currentTier = profile.tier;
   document.querySelectorAll('.tier-btn').forEach(b=>b.classList.toggle('active', b.textContent===profile.tier));
   renderClassGrid();
