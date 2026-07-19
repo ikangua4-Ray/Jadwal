@@ -89,6 +89,7 @@
   }
   .search svg{flex-shrink:0;}
   .topbar-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end;}
+  .icon-group{display:flex;align-items:center;gap:10px;}
   .icon-btn{
     width:36px;height:36px;border-radius:10px;background:#f4f5fb;
     display:flex;align-items:center;justify-content:center;
@@ -135,12 +136,26 @@
     cursor:pointer;
   }
   .guru-item:hover .name{color:var(--blue);}
-  .guru-detail{
-    margin:6px 0 4px;padding:8px 10px;background:#f4f5fb;border-radius:9px;
-    font-size:11.5px;color:var(--muted);display:none;
+  .guru-chevron{
+    display:inline-block;font-size:10px;color:var(--faint);margin-left:4px;
+    transition:transform .3s cubic-bezier(.22,1,.36,1);
   }
-  .guru-detail.show{display:block;}
-  .guru-detail .row{padding:4px 0;border-bottom:1px dashed var(--line);}
+  .guru-chevron.open{transform:rotate(180deg);color:var(--blue);}
+  .guru-detail{
+    margin:0 0 4px;padding:0 10px;background:#f4f5fb;border-radius:9px;
+    font-size:11.5px;color:var(--muted);
+    max-height:0;overflow:hidden;opacity:0;
+    transition:max-height .38s cubic-bezier(.22,1,.36,1), opacity .3s ease, margin .3s ease, padding .3s ease;
+  }
+  .guru-detail.show{
+    opacity:1;margin:8px 0 4px;padding:8px 10px;
+  }
+  .guru-detail .row{
+    padding:4px 0;border-bottom:1px dashed var(--line);
+    opacity:0;transform:translateX(-8px);
+    animation:guruRowIn .35s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  @keyframes guruRowIn{to{opacity:1;transform:translateX(0);}}
   .guru-detail .row:last-child{border-bottom:none;}
   .guru-detail .row b{color:var(--ink);}
   @keyframes guruItemIn{to{opacity:1;transform:translateY(0);}}
@@ -473,6 +488,7 @@
   body.dark-mode .userBadge,body.dark-mode .user-badge{background:#1c1e38;color:#dfe1f5;}
   body.dark-mode .legend-table th{color:#7c81a3;}
   body.dark-mode .legend-code,body.dark-mode .code-tag{background:#262a4d;color:#c3c7ea;}
+  body.dark-mode .card.brk{background:#1c1e38;color:#9498c2;border-color:#33375c;}
   body.dark-mode .auth-overlay{background:rgba(0,0,2,.7);}
 
   /* LEGEND VIEW */
@@ -571,14 +587,16 @@
     </div>
     <div class="topbar-right">
       <div id="userBadge" class="user-badge" style="display:none;"></div>
-      <button class="icon-btn" title="Perkecil teks" onclick="adjustTextScale(-0.1)">A−</button>
-      <button class="icon-btn" title="Perbesar teks" onclick="adjustTextScale(0.1)">A+</button>
-      <button class="icon-btn" id="darkModeBtn" title="Mode gelap" onclick="toggleDarkMode()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      </button>
-      <button class="icon-btn" title="Cetak jadwal" onclick="window.print()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-      </button>
+      <div class="icon-group">
+        <button class="icon-btn" title="Perkecil teks" onclick="adjustTextScale(-0.1)">A−</button>
+        <button class="icon-btn" title="Perbesar teks" onclick="adjustTextScale(0.1)">A+</button>
+        <button class="icon-btn" id="darkModeBtn" title="Mode gelap" onclick="toggleDarkMode()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn" title="Cetak jadwal" onclick="window.print()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -940,10 +958,22 @@ const palette = [
   {bg:"#d3f0ee",fg:"#0f766e"},   // teal
   {bg:"#fde6d6",fg:"#b5480f"},   // apricot
 ];
+const paletteDark = [
+  {bg:"#182a5c",fg:"#9db8ff"},   // blue
+  {bg:"#4a1c34",fg:"#ff9cc0"},   // pink
+  {bg:"#123a2c",fg:"#7fe3ae"},   // mint
+  {bg:"#4a2c0d",fg:"#ffc172"},   // peach
+  {bg:"#2f1f52",fg:"#cbaaff"},   // lavender
+  {bg:"#0f3937",fg:"#6fe0d6"},   // teal
+  {bg:"#4a2413",fg:"#ffab7a"},   // apricot
+];
 const indigoCombo = {bg:"#e2e4fb",fg:"#3a3fb0"};
+const indigoComboDark = {bg:"#262a5e",fg:"#b3bbff"};
+function isDarkMode(){ return document.body.classList.contains('dark-mode'); }
 function hashColor(str){
   let h=0; for(let i=0;i<str.length;i++) h=(h*31+str.charCodeAt(i))|0;
-  return palette[Math.abs(h)%palette.length];
+  const p = isDarkMode() ? paletteDark : palette;
+  return p[Math.abs(h)%p.length];
 }
 function resolveCode(code){
   const parts = String(code).split('.');
@@ -958,7 +988,7 @@ function resolveCode(code){
     }
   });
   const combo = parts.length>1;
-  const color = combo ? indigoCombo : hashColor(codes[0]||'X');
+  const color = combo ? (isDarkMode() ? indigoComboDark : indigoCombo) : hashColor(codes[0]||'X');
   return { code: codes.join(' / '), name: names.join(' / '), guru: gurus.join(' & '), color };
 }
 
@@ -1401,7 +1431,7 @@ function renderGuruList(){
     item.className = 'guru-item';
     item.style.animationDelay = (i*0.045)+'s';
     i++;
-    item.innerHTML = `<div class="name">${name}</div>
+    item.innerHTML = `<div class="name">${name} <span class="guru-chevron" id="guru-chev-${id}">▾</span></div>
       <div class="subjects">${subjects.map(s=>`<span class="subj-badge">${s}</span>`).join('')}</div>
       <div class="guru-detail" id="guru-detail-${id}"></div>`;
     item.addEventListener('click', ()=>toggleGuruDetail(id));
@@ -1414,14 +1444,27 @@ function renderGuruList(){
 
 function toggleGuruDetail(id){
   const detail = document.getElementById('guru-detail-'+id);
+  const chev = document.getElementById('guru-chev-'+id);
   const isShown = detail.classList.contains('show');
-  document.querySelectorAll('.guru-detail.show').forEach(d=>d.classList.remove('show'));
+
+  document.querySelectorAll('.guru-detail.show').forEach(d=>{
+    d.classList.remove('show');
+    d.style.maxHeight = '0px';
+  });
+  document.querySelectorAll('.guru-chevron.open').forEach(c=>c.classList.remove('open'));
+
   if(isShown) return;
+
   const rows = getTeacherSchedule(id);
   detail.innerHTML = rows.length
-    ? rows.map(r=>`<div class="row"><b>${r.day}</b> · ${r.time} — Kelas: ${r.classes.join(', ')}</div>`).join('')
-    : '<div class="row">Tidak ada jadwal mengajar terjadwal.</div>';
+    ? rows.map((r,i)=>`<div class="row" style="animation-delay:${i*0.05}s"><b>${r.day}</b> · ${r.time} — Kelas: ${r.classes.join(', ')}</div>`).join('')
+    : '<div class="row" style="animation-delay:0s">Tidak ada jadwal mengajar terjadwal.</div>';
+
   detail.classList.add('show');
+  chev.classList.add('open');
+  // Measure natural height so the max-height transition animates smoothly
+  // to the exact content size instead of a fixed guess.
+  detail.style.maxHeight = detail.scrollHeight + 'px';
 }
 
 /* ---------- SIDEBAR: SETTINGS ---------- */
@@ -1429,6 +1472,7 @@ function toggleGuruDetail(id){
 function toggleDarkMode(){
   document.body.classList.toggle('dark-mode');
   localStorage.setItem('jadwal_darkMode', document.body.classList.contains('dark-mode') ? '1' : '0');
+  if(selected){ renderSchedule(selected.tier, selected.num); }
 }
 
 function applySettings(){
