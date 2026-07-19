@@ -444,13 +444,18 @@
     border-color:#2a2e4d;
   }
   body.dark-mode .logo{color:#eef0fa;}
-  body.dark-mode .search,body.dark-mode .icon-btn,body.dark-mode .mini-action,
-  body.dark-mode .class-btn,body.dark-mode .tier-toggle,body.dark-mode .chip,
+  body.dark-mode .search,body.dark-mode .icon-btn,body.dark-mode .mini-action:not(.active),
+  body.dark-mode .class-btn:not(.selected),body.dark-mode .tier-toggle,body.dark-mode .chip:not(.selected),
   body.dark-mode .side-nav-item:hover,body.dark-mode .auth-dd-btn,
   body.dark-mode .mini-search,body.dark-mode .auth-input,body.dark-mode textarea.auth-input,
   body.dark-mode .quick-btn,body.dark-mode .info-card,body.dark-mode .stats-bar-track,
   body.dark-mode .day-filter-panel,body.dark-mode .auth-dd-panel,body.dark-mode .legend-table td{
     background:#1c1e38;border-color:#2f3358;color:#dfe1f5;
+  }
+  body.dark-mode .class-btn.selected,body.dark-mode .chip.selected,
+  body.dark-mode .auth-dd-option.selected,body.dark-mode .day-filter-option.selected,
+  body.dark-mode .mini-action.active{
+    background:var(--blue);border-color:var(--blue);color:#fff;
   }
   body.dark-mode .auth-card,body.dark-mode .guru-detail{background:#1c1e38;}
   body.dark-mode .day-filter-option,body.dark-mode .auth-dd-option,body.dark-mode .quick-link,
@@ -1052,6 +1057,7 @@ function renderSchedule(tier,num){
         card.className='card';
         card.style.background = info.color.bg;
         card.style.color = info.color.fg;
+        card.style.border = `1px solid ${info.color.fg}55`;
         card.dataset.subj = (info.name+' '+info.guru).toLowerCase();
         card.dataset.key = day+'|'+item.t;
         card.innerHTML = `<div class="time">${item.t}</div><div class="subj">${info.name||'—'}</div><div class="who">${info.guru||''}</div>`;
@@ -1069,6 +1075,7 @@ function renderSchedule(tier,num){
   observePopIn();
   applyDayFilter();
   updateLiveStatus();
+  renderStats();
 
   // Safety net: if scroll-based reveal doesn't fire (some embedded viewers
   // don't report intersection correctly), force cards visible anyway.
