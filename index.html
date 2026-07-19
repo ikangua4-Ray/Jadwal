@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JadwalKelas — SMAS Yayasan Pupuk Kaltim</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0066cc">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
@@ -231,6 +235,37 @@
   }
   @keyframes classBtnIn{to{opacity:1;transform:translateY(0);}}
   .sidebar .quick{margin-top:26px;}
+  .history-block{margin-top:20px;}
+  .chips-row{display:flex;flex-wrap:wrap;gap:6px;}
+  .history-chip{
+    border:1px solid var(--line);background:#fff;border-radius:20px;
+    padding:6px 12px;font-family:inherit;font-size:12px;font-weight:600;color:var(--ink);
+    cursor:pointer;transition:border-color .15s ease,background .15s ease;
+  }
+  .history-chip:hover{border-color:var(--blue);background:#f7f9ff;}
+  .history-chip.current{background:var(--blue);border-color:var(--blue);color:#fff;}
+
+  /* COMPARE VIEW */
+  .compare-pickers{display:flex;gap:16px;margin-bottom:22px;flex-wrap:wrap;}
+  .compare-picker{flex:1;min-width:140px;}
+  .compare-picker label{display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:6px;}
+  .compare-picker select{width:100%;}
+  .compare-head-row,.compare-row{
+    display:grid;grid-template-columns:78px 1fr 1fr;gap:8px;margin-bottom:7px;align-items:stretch;
+  }
+  .compare-head-row{font-size:12.5px;font-weight:800;color:var(--ink);margin-bottom:10px;}
+  .compare-head-col{background:var(--parchment,#f4f5fb);padding:6px 10px;border-radius:8px;text-align:center;}
+  .compare-day-head{font-weight:800;font-size:14px;color:var(--ink);margin:18px 0 8px;}
+  .compare-day-head:first-child{margin-top:0;}
+  .compare-time{font-size:11px;color:var(--muted);display:flex;align-items:center;}
+  .compare-cell{
+    padding:8px 10px;border-radius:10px;font-size:11.5px;line-height:1.35;
+    border:2px solid transparent;
+  }
+  .compare-cell.brk{background:#f4f5fb;color:var(--muted);text-align:center;grid-column:span 2;display:flex;align-items:center;justify-content:center;}
+  .compare-cell.match{border-color:var(--blue);}
+  .compare-subj{font-weight:700;margin-bottom:2px;}
+  .compare-guru{opacity:.85;}
   .quick-link{
     display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted);
     padding:9px 0;cursor:pointer;font-weight:500;transition:color .15s ease;
@@ -613,6 +648,10 @@
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px;"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       Statistik
     </button>
+    <button class="tab" id="tabCompare" onclick="switchTab('compare')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px;"><path d="M8 3v18M16 3v18"/><path d="M3 8h5M3 16h5M16 8h5M16 16h5"/></svg>
+      Bandingkan
+    </button>
   </div>
 
   <div class="body-row">
@@ -639,6 +678,10 @@
         <div class="tier-block">
           <div class="tier-toggle" id="tierToggle"></div>
           <div class="class-grid" id="classGrid"></div>
+        </div>
+        <div id="historyBlock" class="history-block" style="display:none;">
+          <h3>Terakhir Dibuka</h3>
+          <div class="chips-row" id="historyRow"></div>
         </div>
         <div class="quick">
           <h3>Aksi Cepat</h3>
@@ -669,6 +712,10 @@
         <label class="setting-row">
           <span>Tampilkan kode mapel</span>
           <input type="checkbox" id="toggleShowCodes" checked onchange="applySettings()">
+        </label>
+        <label class="setting-row">
+          <span>Notifikasi 5 menit sebelum kelas mulai</span>
+          <input type="checkbox" id="toggleNotif" onchange="toggleNotifSetting()">
         </label>
         <div class="quick">
           <h3>Lainnya</h3>
@@ -710,6 +757,22 @@
       <div id="statsView" class="legend-view">
         <div class="main-head"><h2 id="statsTitle">Statistik Jam Mengajar</h2></div>
         <div id="statsBody"></div>
+      </div>
+
+      <div id="compareView" class="legend-view">
+        <div class="main-head"><h2>Bandingkan Kelas</h2></div>
+        <p class="auth-note" style="margin-bottom:16px;">Kotak yang ditandai garis biru artinya kedua kelas sedang belajar mapel yang sama di jam yang sama (kemungkinan gabungan kelas).</p>
+        <div class="compare-pickers">
+          <div class="compare-picker">
+            <label>Kelas A</label>
+            <select id="compareASelect" class="auth-select" onchange="renderCompare()"></select>
+          </div>
+          <div class="compare-picker">
+            <label>Kelas B</label>
+            <select id="compareBSelect" class="auth-select" onchange="renderCompare()"></select>
+          </div>
+        </div>
+        <div id="compareBody"></div>
       </div>
     </div>
 
@@ -1048,6 +1111,42 @@ function selectClass(tier,num){
   localStorage.setItem('jadwal_lastClass', JSON.stringify({tier,num}));
   const acc = getProfile();
   if(acc){ acc.tier=tier; acc.num=num; localStorage.setItem('jadwalAccount', JSON.stringify(acc)); }
+
+  pushHistory(tier,num);
+}
+
+/* ---------- RECENT HISTORY (QUICK SWITCH) ---------- */
+function getHistory(){
+  try{ return JSON.parse(localStorage.getItem('jadwal_history')) || []; }catch(e){ return []; }
+}
+function pushHistory(tier,num){
+  let hist = getHistory().filter(h => !(h.tier===tier && h.num===num));
+  hist.unshift({tier,num});
+  hist = hist.slice(0,5);
+  localStorage.setItem('jadwal_history', JSON.stringify(hist));
+  renderHistory();
+}
+function renderHistory(){
+  const hist = getHistory();
+  const block = document.getElementById('historyBlock');
+  const row = document.getElementById('historyRow');
+  // Only worth showing once there's more than just the current class.
+  if(hist.length < 2){ block.style.display = 'none'; return; }
+  block.style.display = 'block';
+  row.innerHTML = '';
+  hist.forEach(h=>{
+    const isCurrent = selected && selected.tier===h.tier && selected.num===h.num;
+    const chip = document.createElement('button');
+    chip.className = 'history-chip'+(isCurrent?' current':'');
+    chip.textContent = `${h.tier}-${h.num}`;
+    chip.onclick = ()=>{
+      currentTier = h.tier;
+      document.querySelectorAll('.tier-btn').forEach(b=>b.classList.toggle('active', b.textContent===h.tier));
+      renderClassGrid();
+      selectClass(h.tier, h.num);
+    };
+    row.appendChild(chip);
+  });
 }
 
 /* ---------- SCHEDULE RENDER ---------- */
@@ -1256,8 +1355,56 @@ function updateLiveStatus(){
     }
   }
   pill.style.display = 'inline-flex';
+
+  checkClassReminder(items, cur, todayName);
 }
 setInterval(updateLiveStatus, 30000);
+
+/* ---------- NOTIFICATION REMINDER ---------- */
+let lastNotifiedKey = null;
+
+function toggleNotifSetting(){
+  const box = document.getElementById('toggleNotif');
+  if(!box.checked){
+    localStorage.setItem('jadwal_notif', '0');
+    return;
+  }
+  if(!('Notification' in window)){
+    alert('Browser ini tidak mendukung notifikasi.');
+    box.checked = false;
+    return;
+  }
+  Notification.requestPermission().then(perm=>{
+    if(perm === 'granted'){
+      localStorage.setItem('jadwal_notif', '1');
+      new Notification('JadwalKelas', { body: 'Notifikasi diaktifkan — kamu akan diingatkan 5 menit sebelum kelas mulai.' });
+    } else {
+      localStorage.setItem('jadwal_notif', '0');
+      box.checked = false;
+      alert('Izin notifikasi ditolak. Aktifkan lewat pengaturan browser kalau berubah pikiran.');
+    }
+  });
+}
+
+function checkClassReminder(items, cur, day){
+  if(localStorage.getItem('jadwal_notif') !== '1') return;
+  if(!('Notification' in window) || Notification.permission !== 'granted') return;
+  if(!selected) return;
+
+  const upcoming = items.find(item => !item.b && parseTimeRange(item.t).start > cur);
+  if(!upcoming) return;
+
+  const minutesLeft = parseTimeRange(upcoming.t).start - cur;
+  const key = day + '|' + upcoming.t;
+  if(minutesLeft >= 1 && minutesLeft <= 5 && lastNotifiedKey !== key){
+    lastNotifiedKey = key;
+    const idx = colIndex(selected.tier, selected.num);
+    const info = resolveCode(upcoming.c[idx]);
+    new Notification('Sebentar lagi mulai', {
+      body: `${info.name} jam ${upcoming.t} (${minutesLeft} menit lagi) — Kelas ${selected.tier}-${selected.num}`
+    });
+  }
+}
 
 /* ---------- STATS ---------- */
 function renderStats(){
@@ -1302,6 +1449,77 @@ function renderStats(){
     const fillEl = row.querySelector('.stats-bar-fill');
     setTimeout(()=>{ fillEl.style.width = (mins/max*100)+'%'; }, 50 + i*40);
   });
+}
+
+/* ---------- COMPARE 2 CLASSES ---------- */
+function populateCompareSelects(){
+  const selA = document.getElementById('compareASelect');
+  const selB = document.getElementById('compareBSelect');
+  if(!selA || selA.options.length) return; // already populated
+  classNames.forEach((name,i)=>{
+    const optA = document.createElement('option');
+    optA.value = name; optA.textContent = name;
+    selA.appendChild(optA);
+    const optB = document.createElement('option');
+    optB.value = name; optB.textContent = name;
+    selB.appendChild(optB);
+  });
+  // Sensible defaults so the view isn't empty on first visit.
+  if(selected){
+    selA.value = `${selected.tier}-${selected.num}`;
+  } else {
+    selA.value = classNames[0];
+  }
+  selB.value = classNames[1] || classNames[0];
+}
+
+function renderCompare(){
+  populateCompareSelects();
+  const nameA = document.getElementById('compareASelect').value;
+  const nameB = document.getElementById('compareBSelect').value;
+  const body = document.getElementById('compareBody');
+  if(!nameA || !nameB){
+    body.innerHTML = '<div class="empty-state">Pilih dua kelas buat dibandingkan.</div>';
+    return;
+  }
+  const [tierA, numAstr] = nameA.split('-');
+  const [tierB, numBstr] = nameB.split('-');
+  const idxA = colIndex(tierA, parseInt(numAstr,10));
+  const idxB = colIndex(tierB, parseInt(numBstr,10));
+
+  let html = '';
+  Object.keys(schedule).forEach(day=>{
+    html += `<div class="compare-day-head">${day}</div>`;
+    html += `<div class="compare-head-row">
+      <div class="compare-head-col">Waktu</div>
+      <div class="compare-head-col">${nameA}</div>
+      <div class="compare-head-col">${nameB}</div>
+    </div>`;
+    schedule[day].forEach(item=>{
+      if(item.b){
+        html += `<div class="compare-row">
+          <div class="compare-time">${item.t}</div>
+          <div class="compare-cell brk">${item.l}</div>
+        </div>`;
+      } else {
+        const infoA = resolveCode(item.c[idxA]);
+        const infoB = resolveCode(item.c[idxB]);
+        const isMatch = infoA.name && infoA.name === infoB.name;
+        html += `<div class="compare-row">
+          <div class="compare-time">${item.t}</div>
+          <div class="compare-cell${isMatch?' match':''}" style="background:${infoA.color.bg};color:${infoA.color.fg};">
+            <div class="compare-subj">${infoA.name||'—'}</div>
+            <div class="compare-guru">${infoA.guru||''}</div>
+          </div>
+          <div class="compare-cell${isMatch?' match':''}" style="background:${infoB.color.bg};color:${infoB.color.fg};">
+            <div class="compare-subj">${infoB.name||'—'}</div>
+            <div class="compare-guru">${infoB.guru||''}</div>
+          </div>
+        </div>`;
+      }
+    });
+  });
+  body.innerHTML = html;
 }
 
 /* ---------- EXPORT AS IMAGE ---------- */
@@ -1384,10 +1602,13 @@ function switchTab(tab){
   document.getElementById('tabSchedule').classList.toggle('active', tab==='schedule');
   document.getElementById('tabLegend').classList.toggle('active', tab==='legend');
   document.getElementById('tabStats').classList.toggle('active', tab==='stats');
+  document.getElementById('tabCompare').classList.toggle('active', tab==='compare');
   document.getElementById('scheduleView').style.display = tab==='schedule' ? 'block' : 'none';
   document.getElementById('legendView').classList.toggle('show', tab==='legend');
   document.getElementById('statsView').classList.toggle('show', tab==='stats');
+  document.getElementById('compareView').classList.toggle('show', tab==='compare');
   if(tab==='stats') renderStats();
+  if(tab==='compare') renderCompare();
 }
 
 /* ---------- LEGEND ---------- */
@@ -1664,6 +1885,9 @@ function getKelasFromUrl(){
 function initApp(){
   populateAuthNumSelect();
   applyTextScale();
+  document.getElementById('toggleNotif').checked =
+    (localStorage.getItem('jadwal_notif')==='1' && 'Notification' in window && Notification.permission==='granted');
+  renderHistory();
 
   const fromUrl = getKelasFromUrl();
   if(fromUrl){
@@ -1689,6 +1913,13 @@ function initApp(){
   }
 }
 initApp();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+
 </script>
 </body>
 </html>
