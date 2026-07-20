@@ -522,10 +522,23 @@
     opacity:0;transform:scale(.82) translateY(16px);
     transition:opacity .5s cubic-bezier(.34,1.56,.64,1), transform .5s cubic-bezier(.34,1.56,.64,1);
     will-change:transform,opacity;
+    position:relative;
   }
   .card.in-view{opacity:1;transform:scale(1) translateY(0);}
   .card:hover{transform:translateY(-2px) scale(1.02);}
   .card.in-view:hover{transform:translateY(-2px) scale(1.02);}
+  .note-btn{
+    position:absolute;top:5px;right:5px;width:19px;height:19px;border-radius:50%;
+    border:none;background:rgba(255,255,255,.65);display:flex;align-items:center;justify-content:center;
+    font-size:10px;cursor:pointer;opacity:.5;line-height:1;padding:0;
+    transition:opacity .15s ease,transform .15s ease;
+  }
+  .note-btn:hover{opacity:1;transform:scale(1.12);}
+  .note-btn.has-note{opacity:1;background:#fff3d6;}
+  .note-indicator{
+    display:block;margin-top:4px;font-size:10px;font-style:italic;
+    opacity:.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
   .card .time{font-size:10.5px;font-weight:700;opacity:.85;margin-bottom:2px;}
   .card .subj{font-weight:800;margin-bottom:1px;}
   .card .who{font-size:10.5px;font-weight:600;opacity:.9;}
@@ -1020,6 +1033,17 @@
       <button class="auth-skip" onclick="closeQr()">Tutup</button>
     </div>
   </div>
+
+  <div id="noteOverlay" class="auth-overlay" style="display:none;">
+    <div class="auth-card">
+      <h3 id="noteModalTitle">Catatan Pribadi</h3>
+      <p class="auth-note">Cuma kamu yang bisa lihat ini — tersimpan di perangkat ini aja, bukan buat orang lain.</p>
+      <textarea id="noteText" class="auth-input" rows="4" style="resize:vertical;" placeholder="Contoh: Bawa buku gambar, ada kuis dadakan, jangan lupa PR…"></textarea>
+      <button class="quick-btn primary" style="width:100%;margin-bottom:8px;" onclick="saveNote()">Simpan Catatan</button>
+      <button class="quick-btn" style="width:100%;margin-bottom:8px;" onclick="deleteNote()">Hapus Catatan</button>
+      <button class="auth-skip" onclick="closeNoteModal()">Batal</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -1363,7 +1387,17 @@ function renderSchedule(tier,num){
         card.style.border = `1px solid ${info.color.fg}55`;
         card.dataset.subj = (info.name+' '+info.guru).toLowerCase();
         card.dataset.key = day+'|'+item.t;
-        card.innerHTML = `<div class="time">${item.t}</div><div class="subj">${info.name||'—'}</div><div class="who">${info.guru||''}</div>`;
+
+        const noteKey = `${tier}-${num}|${day}|${item.t}`;
+        const noteText = getNotes()[noteKey];
+        const safeSubj = (info.name||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+
+        card.innerHTML = `
+          <button class="note-btn${noteText?' has-note':''}" title="Catatan pribadi" onclick="event.stopPropagation();openNoteModal('${noteKey}','${safeSubj}')">${noteText?'📌':'🗒️'}</button>
+          <div class="time">${item.t}</div>
+          <div class="subj">${info.name||'—'}</div>
+          <div class="who">${info.guru||''}</div>
+          ${noteText ? `<div class="note-indicator">📝 ${noteText}</div>` : ''}`;
       }
       body.appendChild(card);
     });
@@ -2216,7 +2250,7 @@ const piketData = {
   "X-2": {
     Senin: ["Dely","Daniel","Dhevi","Cc","Helga","Nijam"],
     Selasa: ["Silmy","Nara","Kamaya","Sabrina","Jojo","Mada"],
-    Rabu: ["Haris","Adzra","Khansa","Noura","Nisa","Syifa"],
+    Rabu: ["Haris","Adzra","Khansa","Noura","Nisa"],
     Kamis: ["Rafael","Almer","Fafa","Kayyisa","Eki"],
     Jumat: ["Ihsan","Rayhan","Shiba","Adriel","Praba"]
   }
@@ -2322,6 +2356,48 @@ function contactAdminRuang(section){
   const message = `Halo admin, saya mau nambahin ${what} untuk Ruang Kelas ${label} di JadwalKelas.`;
   const url = `https://wa.me/${RUANG_ADMIN_WA}?text=${encodeURIComponent(message)}`;
   window.open(url, '_blank');
+}
+
+/* ---------- PERSONAL NOTES PER LESSON (local only) ---------- */
+let activeNoteKey = null;
+
+function getNotes(){
+  try{ return JSON.parse(localStorage.getItem('jadwal_notes')) || {}; }
+  catch(e){ return {}; }
+}
+function saveNotes(notes){
+  localStorage.setItem('jadwal_notes', JSON.stringify(notes));
+}
+
+function openNoteModal(key, subjectLabel){
+  activeNoteKey = key;
+  const notes = getNotes();
+  document.getElementById('noteModalTitle').textContent = `Catatan — ${subjectLabel}`;
+  document.getElementById('noteText').value = notes[key] || '';
+  document.getElementById('noteOverlay').style.display = 'flex';
+  setTimeout(()=>document.getElementById('noteText').focus(), 50);
+}
+function closeNoteModal(){
+  document.getElementById('noteOverlay').style.display = 'none';
+  activeNoteKey = null;
+}
+function saveNote(){
+  if(!activeNoteKey) return;
+  const text = document.getElementById('noteText').value.trim();
+  const notes = getNotes();
+  if(text) notes[activeNoteKey] = text;
+  else delete notes[activeNoteKey];
+  saveNotes(notes);
+  closeNoteModal();
+  if(selected) renderSchedule(selected.tier, selected.num);
+}
+function deleteNote(){
+  if(!activeNoteKey) return;
+  const notes = getNotes();
+  delete notes[activeNoteKey];
+  saveNotes(notes);
+  closeNoteModal();
+  if(selected) renderSchedule(selected.tier, selected.num);
 }
 
 function initApp(){
