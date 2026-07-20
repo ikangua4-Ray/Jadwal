@@ -2237,4 +2237,141 @@ function renderPiketList(label){
       : `<span class="piket-empty-name">Belum diisi</span>`;
     return `<div class="piket-day-row${isToday?' today':''}">
       <div class="piket-day-label">${day}${isToday?' <span class="piket-today-badge">🔥 Hari Ini</span>':''}</div>
-      <div class="piket-names">${n
+      <div class="piket-names">${namesHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+// Class officer structure per class, filled in by admin on request.
+const strukturData = {
+  "X-2": [
+    { role:"Ketua Kelas", name:"Kamaya", lead:true },
+    { role:"Wakil Ketua", name:"Rayhan", lead:true },
+    { role:"Sekretaris", name:"Dhevi" },
+    { role:"Bendahara", name:"Cc" },
+    { role:"Koordinator Ketertiban", name:"Nara" },
+    { role:"Koordinator Upacara", name:"Dely" },
+    { role:"Koordinator Kebersihan", name:"Eki" },
+    { role:"Koordinator Kerohanian", name:"Jojo" },
+    { role:"Koordinator Humas & Dokumentasi", name:"Praba" }
+  ]
+};
+
+function renderStrukturList(label){
+  const roster = strukturData[label];
+  if(!roster || !roster.length) return null;
+  return roster.map(r=>`
+    <div class="struktur-row${r.lead?' lead':''}">
+      <span class="struktur-role">${r.lead ? '👑 ' : ''}${r.role}</span>
+      <span class="struktur-name">${r.name}</span>
+    </div>`).join('');
+}
+
+function renderRuangKelas(){
+  const body = document.getElementById('ruangKelasBody');
+  if(!selected){
+    body.innerHTML = '<div class="empty-state">Pilih kelas dulu buat buka Ruang Kelas.</div>';
+    return;
+  }
+  if(selected.tier !== 'X'){
+    body.innerHTML = `
+      <div class="ruang-locked">
+        <div style="font-size:22px;">🚧</div>
+        <p><b>Ruang Kelas baru tersedia untuk kelas X dulu</b><br>
+        Kelas XI dan XII menyusul setelah masa uji coba selesai. Sabar ya!</p>
+      </div>`;
+    return;
+  }
+
+  const label = `${selected.tier}-${selected.num}`;
+  const strukturHtml = renderStrukturList(label);
+  body.innerHTML = `
+    <div class="ruang-section">
+      <h4>👥 Struktur Kelas</h4>
+      ${strukturHtml
+        ? `<div class="struktur-list">${strukturHtml}</div>
+           <div class="ruang-empty" style="margin-top:10px;">
+             <p style="margin-bottom:10px;">Ada yang salah atau mau diganti? Hubungi admin.</p>
+             <button class="ruang-wa-btn" onclick="contactAdminRuang('struktur')">💬 Hubungi Admin buat Update</button>
+           </div>`
+        : `<div class="ruang-empty">
+             <div class="ruang-empty-icon">📋</div>
+             <p>Belum ada struktur kelas (ketua, wakil, sekretaris, dll) buat ${label}.</p>
+             <button class="ruang-wa-btn" onclick="contactAdminRuang('struktur')">💬 Hubungi Admin buat Nambahin</button>
+           </div>`
+      }
+    </div>
+    <div class="ruang-section">
+      <h4>🧹 Jadwal Piket</h4>
+      <div class="piket-list">${renderPiketList(label)}</div>
+      <div class="ruang-empty" style="margin-top:10px;">
+        <p style="margin-bottom:10px;">Nama masih kosong? Minta admin isi lewat WhatsApp.</p>
+        <button class="ruang-wa-btn" onclick="contactAdminRuang('piket')">💬 Hubungi Admin buat Nambahin</button>
+        <div style="margin-top:10px;">
+          <button class="mini-action" onclick="openPiketQr()">📌 QR Jadwal Piket</button>
+        </div>
+        <p style="margin-top:8px;font-size:11px;">Tempel QR ini di kelas — begitu jadwal piketnya diisi admin, scan QR langsung nunjukin jadwal piket hari itu, nggak perlu buka-buka app lagi.</p>
+      </div>
+    </div>`;
+}
+
+function contactAdminRuang(section){
+  if(!selected) return;
+  const label = `${selected.tier}-${selected.num}`;
+  const what = section === 'struktur' ? 'struktur kelas (ketua, wakil, sekretaris, dll)' : 'jadwal piket harian';
+  const message = `Halo admin, saya mau nambahin ${what} untuk Ruang Kelas ${label} di JadwalKelas.`;
+  const url = `https://wa.me/${RUANG_ADMIN_WA}?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank');
+}
+
+function initApp(){
+  // Restore the class FIRST and in its own try/catch, so nothing else in
+  // this function (settings checkboxes, history chips, etc.) can ever
+  // silently block it from running if something upstream throws.
+  try{
+    const fromUrl = getKelasFromUrl();
+    if(fromUrl){
+      const profile = getProfile();
+      if(profile) applyLoggedInUI(profile);
+      selectClass(fromUrl.tier, fromUrl.num);
+      const panelParam = new URLSearchParams(location.search).get('panel');
+      if(panelParam === 'ruang'){ switchSidePanel('ruang'); }
+    } else {
+      const profile = getProfile();
+      if(profile && ['X','XI','XII'].includes(profile.tier) && profile.num >= 1 && profile.num <= 8){
+        applyLoggedInUI(profile);
+        selectClass(profile.tier, profile.num);
+      } else {
+        const last = getLastClass();
+        if(last && ['X','XI','XII'].includes(last.tier) && last.num >= 1 && last.num <= 8){
+          selectClass(last.tier, last.num);
+        } else {
+          showAuthOverlay();
+        }
+      }
+    }
+  } catch(e){
+    console.error('Gagal memulihkan kelas terakhir:', e);
+    showAuthOverlay();
+  }
+
+  try{ populateAuthNumSelect(); }catch(e){ console.error(e); }
+  try{ applyTextScale(); }catch(e){ console.error(e); }
+  try{
+    document.getElementById('toggleNotif').checked =
+      (localStorage.getItem('jadwal_notif')==='1' && 'Notification' in window && Notification.permission==='granted');
+  }catch(e){ console.error(e); }
+  try{ renderHistory(); }catch(e){ console.error(e); }
+}
+initApp();
+renderTasks();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+
+</script>
+</body>
+</html>
