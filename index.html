@@ -528,12 +528,14 @@
   .card:hover{transform:translateY(-2px) scale(1.02);}
   .card.in-view:hover{transform:translateY(-2px) scale(1.02);}
   .note-btn{
-    position:absolute;top:5px;right:5px;width:19px;height:19px;border-radius:50%;
-    border:none;background:rgba(255,255,255,.65);display:flex;align-items:center;justify-content:center;
-    font-size:10px;cursor:pointer;opacity:.5;line-height:1;padding:0;
-    transition:opacity .15s ease,transform .15s ease;
+    position:absolute;top:5px;right:5px;width:28px;height:28px;border-radius:50%;
+    border:1px solid rgba(0,0,0,.1);background:#ffffff;display:flex;align-items:center;justify-content:center;
+    font-size:13px;cursor:pointer;opacity:1;line-height:1;padding:0;
+    box-shadow:0 1px 3px rgba(0,0,0,.15);
+    transition:transform .15s ease,box-shadow .15s ease;
   }
-  .note-btn:hover{opacity:1;transform:scale(1.12);}
+  .note-btn:hover{transform:scale(1.12);box-shadow:0 2px 6px rgba(0,0,0,.22);}
+  .note-btn:active{transform:scale(0.95);}
   .note-btn.has-note{opacity:1;background:#fff3d6;}
   .note-indicator{
     display:block;margin-top:4px;font-size:10px;font-style:italic;
@@ -667,6 +669,48 @@
   body.dark-mode .struktur-name{color:#eef0fa;}
   body.dark-mode .struktur-role{color:#9498c2;}
   body.dark-mode .struktur-row.lead .struktur-role,body.dark-mode .struktur-row.lead .struktur-name{color:#e0c168;}
+  body.dark-mode .cal-month-label{color:#eef0fa;}
+  body.dark-mode .cal-day{color:#dfe1f5;}
+  body.dark-mode .cal-day:hover{background:#1c1e38;}
+  body.dark-mode .cal-day.weekend{color:#7c81a3;}
+  body.dark-mode .cal-selected-title,body.dark-mode .cal-sched-subj{color:#eef0fa;}
+  body.dark-mode .cal-sched-row{border-color:#2f3358;}
+  body.dark-mode .cal-sched-time{color:#7c81a3;}
+
+  .cal-nav{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:16px;
+  }
+  .cal-month-label{font-size:15px;font-weight:700;color:var(--ink);}
+  .cal-weekdays{
+    display:grid;grid-template-columns:repeat(7,1fr);
+    text-align:center;font-size:11px;font-weight:700;color:var(--faint);
+    margin-bottom:6px;
+  }
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .cal-day{
+    aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--ink);
+    border:1px solid transparent;position:relative;
+    transition:background .15s ease,border-color .15s ease;
+  }
+  .cal-day:hover{background:#f4f5fb;}
+  .cal-day.empty{cursor:default;}
+  .cal-day.empty:hover{background:none;}
+  .cal-day.weekend{color:var(--faint);}
+  .cal-day .cal-dot{width:4px;height:4px;border-radius:50%;background:var(--blue);margin-top:2px;}
+  .cal-day.today{border-color:var(--blue);font-weight:800;}
+  .cal-day.selected{background:var(--blue);color:#fff;}
+  .cal-day.selected .cal-dot{background:#fff;}
+  .cal-selected-schedule{margin-top:22px;}
+  .cal-selected-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:10px;}
+  .cal-sched-row{
+    display:flex;justify-content:space-between;gap:10px;
+    padding:9px 0;border-bottom:1px solid var(--line);font-size:12px;
+  }
+  .cal-sched-row:last-child{border-bottom:none;}
+  .cal-sched-time{color:var(--faint);white-space:nowrap;}
+  .cal-sched-subj{font-weight:700;color:var(--ink);text-align:right;}
   body.dark-mode .compare-cell.brk,body.dark-mode .compare-head-col{
     background:#1c1e38;color:#9498c2;
   }
@@ -798,6 +842,10 @@
     <button class="tab" id="tabCompare" onclick="switchTab('compare')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px;"><path d="M8 3v18M16 3v18"/><path d="M3 8h5M3 16h5M16 8h5M16 16h5"/></svg>
       Bandingkan
+    </button>
+    <button class="tab" id="tabCalendar" onclick="switchTab('calendar')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Kalender
     </button>
   </div>
 
@@ -959,6 +1007,20 @@
           </div>
         </div>
         <div id="compareBody"></div>
+      </div>
+
+      <div id="calendarView" class="legend-view">
+        <div class="main-head"><h2>Kalender</h2></div>
+        <div class="cal-nav">
+          <button class="mini-action" onclick="changeCalMonth(-1)">‹</button>
+          <div class="cal-month-label" id="calMonthLabel"></div>
+          <button class="mini-action" onclick="changeCalMonth(1)">›</button>
+        </div>
+        <div class="cal-weekdays">
+          <span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div id="calSelectedSchedule" class="cal-selected-schedule"></div>
       </div>
     </div>
 
@@ -1818,12 +1880,15 @@ function switchTab(tab){
   document.getElementById('tabLegend').classList.toggle('active', tab==='legend');
   document.getElementById('tabStats').classList.toggle('active', tab==='stats');
   document.getElementById('tabCompare').classList.toggle('active', tab==='compare');
+  document.getElementById('tabCalendar').classList.toggle('active', tab==='calendar');
   document.getElementById('scheduleView').style.display = tab==='schedule' ? 'block' : 'none';
   document.getElementById('legendView').classList.toggle('show', tab==='legend');
   document.getElementById('statsView').classList.toggle('show', tab==='stats');
   document.getElementById('compareView').classList.toggle('show', tab==='compare');
+  document.getElementById('calendarView').classList.toggle('show', tab==='calendar');
   if(tab==='stats') renderStats();
   if(tab==='compare') renderCompare();
+  if(tab==='calendar') renderCalendar();
 }
 
 /* ---------- LEGEND ---------- */
@@ -2398,6 +2463,96 @@ function deleteNote(){
   saveNotes(notes);
   closeNoteModal();
   if(selected) renderSchedule(selected.tier, selected.num);
+}
+
+/* ---------- KALENDER ---------- */
+const now0 = new Date();
+let calYear = now0.getFullYear();
+let calMonth = now0.getMonth(); // 0-indexed
+let calSelectedDate = null; // 'YYYY-MM-DD'
+
+const CAL_MONTH_NAMES = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const CAL_DAY_NAMES = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+
+function changeCalMonth(delta){
+  calMonth += delta;
+  if(calMonth < 0){ calMonth = 11; calYear--; }
+  if(calMonth > 11){ calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+function pad2(n){ return String(n).padStart(2,'0'); }
+
+function renderCalendar(){
+  document.getElementById('calMonthLabel').textContent = `${CAL_MONTH_NAMES[calMonth]} ${calYear}`;
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${pad2(today.getMonth()+1)}-${pad2(today.getDate())}`;
+
+  for(let i=0;i<firstDay;i++){
+    const filler = document.createElement('div');
+    filler.className = 'cal-day empty';
+    grid.appendChild(filler);
+  }
+
+  for(let d=1; d<=daysInMonth; d++){
+    const dow = new Date(calYear, calMonth, d).getDay();
+    const dateStr = `${calYear}-${pad2(calMonth+1)}-${pad2(d)}`;
+    const isSchoolDay = dow >= 1 && dow <= 5;
+    const cell = document.createElement('div');
+    cell.className = 'cal-day' + (!isSchoolDay ? ' weekend' : '') + (dateStr===todayStr ? ' today' : '') + (dateStr===calSelectedDate ? ' selected' : '');
+    cell.innerHTML = `${d}${isSchoolDay ? '<span class="cal-dot"></span>' : ''}`;
+    cell.onclick = () => selectCalDate(dateStr);
+    grid.appendChild(cell);
+  }
+
+  if(calSelectedDate){
+    renderCalSelectedSchedule();
+  }
+}
+
+function selectCalDate(dateStr){
+  calSelectedDate = dateStr;
+  renderCalendar();
+  renderCalSelectedSchedule();
+}
+
+function renderCalSelectedSchedule(){
+  const box = document.getElementById('calSelectedSchedule');
+  if(!calSelectedDate){ box.innerHTML=''; return; }
+
+  const [y,m,d] = calSelectedDate.split('-').map(Number);
+  const dateObj = new Date(y, m-1, d);
+  const dow = dateObj.getDay();
+  const dayName = CAL_DAY_NAMES[dow];
+  const dateLabel = dateObj.toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+
+  if(dow === 0 || dow === 6){
+    box.innerHTML = `<div class="cal-selected-title">${dateLabel}</div><div class="empty-state" style="padding:24px 4px;">Akhir pekan — tidak ada jadwal pelajaran.</div>`;
+    return;
+  }
+  if(!selected){
+    box.innerHTML = `<div class="cal-selected-title">${dateLabel}</div><div class="empty-state" style="padding:24px 4px;">Pilih kelas dulu buat lihat jadwalnya.</div>`;
+    return;
+  }
+
+  const idx = colIndex(selected.tier, selected.num);
+  const items = schedule[dayName] || [];
+  let rows = '';
+  items.forEach(item=>{
+    if(item.b){
+      rows += `<div class="cal-sched-row"><span class="cal-sched-time">${item.t}</span><span class="cal-sched-subj" style="color:var(--faint);font-weight:600;">${item.l}</span></div>`;
+    } else {
+      const info = resolveCode(item.c[idx]);
+      rows += `<div class="cal-sched-row"><span class="cal-sched-time">${item.t}</span><span class="cal-sched-subj">${info.name}</span></div>`;
+    }
+  });
+
+  box.innerHTML = `<div class="cal-selected-title">${dateLabel} — Kelas ${selected.tier}-${selected.num}</div>${rows}`;
 }
 
 function initApp(){
