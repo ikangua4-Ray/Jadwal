@@ -2129,10 +2129,15 @@ function sendFeedback(){
 /* ---------- SEND SCHEDULE TO WHATSAPP (TEXT) ---------- */
 function formatScheduleForWhatsapp(){
   const idx = colIndex(selected.tier, selected.num);
-  let text = `📅 *Jadwal Pelajaran Kelas ${selected.tier}-${selected.num}*\n`;
+  const daysToSend = selectedDays.size ? Object.keys(schedule).filter(d => selectedDays.has(d)) : Object.keys(schedule);
+  const scopeLabel = selectedDays.size === 1 ? Array.from(selectedDays)[0]
+    : selectedDays.size > 1 ? daysToSend.join(', ')
+    : 'Seminggu';
+
+  let text = `📅 *Jadwal Pelajaran Kelas ${selected.tier}-${selected.num}* (${scopeLabel})\n`;
   text += `_SMAS Yayasan Pupuk Kaltim · Semester 1, Tahun Ajaran 2026/2027_\n\n`;
 
-  Object.keys(schedule).forEach(day=>{
+  daysToSend.forEach(day=>{
     text += `*${day}*\n`;
     schedule[day].forEach(item=>{
       if(item.b){
