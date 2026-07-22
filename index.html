@@ -475,6 +475,7 @@
     padding:3px 9px;border-radius:20px;
   }
   .piket-day-row.today .piket-name{background:#dbe4ff;color:var(--blue);}
+  .piket-name.me{background:#a8630a;color:#fff;font-weight:800;}
   .piket-empty-name{font-size:11px;color:var(--faint);font-style:italic;}
 
   .struktur-list{border:1px solid var(--line);border-radius:12px;overflow:hidden;}
@@ -541,6 +542,16 @@
     display:block;margin-top:4px;font-size:10px;font-style:italic;
     opacity:.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   }
+  .card.table-row{
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    background:#fff;border:1px solid var(--line) !important;border-radius:8px;
+    padding:8px 32px 8px 10px;
+  }
+  .card.table-row.brk{background:var(--ash);}
+  .tr-time{width:70px;flex-shrink:0;font-size:10.5px;font-weight:700;color:var(--faint);}
+  .tr-subj{flex:1;font-size:11px;font-weight:800;min-width:80px;}
+  .tr-guru{font-size:10px;color:var(--muted);width:100%;}
+  .card.table-row .note-indicator{width:100%;margin-top:0;}
   .card .time{font-size:10.5px;font-weight:700;opacity:.85;margin-bottom:2px;}
   .card .subj{font-weight:800;margin-bottom:1px;}
   .card .who{font-size:10.5px;font-weight:600;opacity:.9;}
@@ -638,6 +649,10 @@
   body.dark-mode .legend-table th{color:#7c81a3;}
   body.dark-mode .legend-code,body.dark-mode .code-tag{background:#262a4d;color:#c3c7ea;}
   body.dark-mode .card.brk{background:#1c1e38;color:#9498c2;border-color:#33375c;}
+  body.dark-mode .card.table-row{background:#171933 !important;border-color:#2f3358 !important;}
+  body.dark-mode .card.table-row.brk{background:#1c1e38 !important;}
+  body.dark-mode .tr-guru{color:#9498c2;}
+  body.dark-mode .tr-time{color:#7c81a3;}
   body.dark-mode .auth-select{
     background-color:#1c1e38 !important;border-color:#2f3358;color:#dfe1f5;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239498c2' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
@@ -676,6 +691,16 @@
   body.dark-mode .cal-selected-title,body.dark-mode .cal-sched-subj{color:#eef0fa;}
   body.dark-mode .cal-sched-row{border-color:#2f3358;}
   body.dark-mode .cal-sched-time{color:#7c81a3;}
+  body.dark-mode .piket-banner{background:#332a12;border-color:#5a4a1e;color:#e0c168;}
+  body.dark-mode .sched-table th{color:#7c81a3;border-color:#2f3358;}
+  body.dark-mode .sched-table td{border-color:#2f3358;color:#dfe1f5;}
+  body.dark-mode .sched-table tr.brk-row td{background:#1c1e38;color:#7c81a3;}
+  body.dark-mode .sched-table tr.day-header-row td{background:#1c1e38;color:#eef0fa;}
+  body.dark-mode .sched-table .st-guru{color:#9498c2;}
+  body.dark-mode .calc-btn{background:#1c1e38;border-color:#2f3358;color:#dfe1f5;}
+  body.dark-mode .calc-btn:hover{background:#22254a;}
+  body.dark-mode .calc-fn{background:#171933;color:#9498c2;}
+  body.dark-mode .calc-op{background:#22285e;color:#9cb6ff;}
 
   .cal-nav{
     display:flex;align-items:center;justify-content:space-between;
@@ -711,6 +736,44 @@
   .cal-sched-row:last-child{border-bottom:none;}
   .cal-sched-time{color:var(--faint);white-space:nowrap;}
   .cal-sched-subj{font-weight:700;color:var(--ink);text-align:right;}
+
+  .piket-banner{
+    display:flex;align-items:center;gap:8px;
+    background:#fff3d6;border:1px solid #e8d48a;border-radius:12px;
+    padding:12px 16px;margin:0 0 16px;font-size:13px;font-weight:600;color:#a8630a;
+  }
+
+  .sched-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .sched-table th{
+    text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;
+    color:var(--faint);padding:8px 10px;border-bottom:2px solid var(--line);
+  }
+  .sched-table td{padding:9px 10px;border-bottom:1px solid var(--line);}
+  .sched-table tr.brk-row td{color:var(--faint);font-style:italic;background:var(--ash);}
+  .sched-table tr.day-header-row td{
+    font-weight:800;color:var(--ink);background:var(--parchment);padding-top:12px;padding-bottom:8px;
+  }
+  .sched-table .st-subj{font-weight:700;}
+  .sched-table .st-guru{color:var(--muted);font-size:11.5px;}
+
+  .calc-wrap{max-width:320px;}
+  .calc-display{
+    background:#1d1d1f;color:#fff;border-radius:12px;
+    padding:20px 16px;text-align:right;font-size:26px;font-weight:600;
+    margin-bottom:12px;overflow-x:auto;white-space:nowrap;font-family:'IBM Plex Mono',monospace;
+  }
+  .calc-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
+  .calc-btn{
+    aspect-ratio:1;border:1px solid var(--line);border-radius:10px;background:#fff;
+    font-family:inherit;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;
+    transition:background .12s ease,transform .1s ease;
+  }
+  .calc-btn:active{transform:scale(0.92);}
+  .calc-btn:hover{background:#f4f5fb;}
+  .calc-fn{font-size:11px;color:var(--muted);background:var(--ash);}
+  .calc-op{background:#eef2ff;color:var(--blue);font-size:16px;}
+  .calc-eq{background:var(--blue);color:#fff;font-size:16px;}
+  .calc-eq:hover{background:var(--blue-dark);}
   body.dark-mode .compare-cell.brk,body.dark-mode .compare-head-col{
     background:#1c1e38;color:#9498c2;
   }
@@ -876,6 +939,10 @@
           Ruang Kelas
           <span class="nav-badge" style="background:#fff3d6;color:#a8630a;">Baru</span>
         </button>
+        <button class="side-nav-item" data-panel="kalkulator" onclick="switchSidePanel('kalkulator')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10.01"/><line x1="12" y1="10" x2="12" y2="10.01"/><line x1="16" y1="10" x2="16" y2="10.01"/><line x1="8" y1="14" x2="8" y2="14.01"/><line x1="12" y1="14" x2="12" y2="14.01"/><line x1="16" y1="14" x2="16" y2="14.01"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
+          Kalkulator Sains
+        </button>
       </div>
 
       <div class="side-panel" id="sidePanel-kelas">
@@ -894,6 +961,7 @@
           <button class="quick-link" onclick="switchTab('legend')">📖 Lihat Legenda Kode</button>
           <button class="quick-link" onclick="openQr()">📌 QR Kelas Ini</button>
           <button class="quick-link" onclick="sendToWhatsapp()">💬 Kirim ke WhatsApp</button>
+          <button class="quick-link" onclick="exportToIcs()">📆 Ekspor ke Kalender HP</button>
         </div>
       </div>
 
@@ -956,6 +1024,53 @@
         </div>
         <div id="ruangKelasBody"></div>
       </div>
+
+      <div class="side-panel" id="sidePanel-kalkulator" style="display:none;">
+        <div class="panel-head">
+          <h3 style="margin:0;">Kalkulator Sains</h3>
+          <button class="panel-close" onclick="switchSidePanel('kelas')" title="Tutup">✕</button>
+        </div>
+        <div class="calc-wrap">
+          <div class="calc-display" id="calcDisplay">0</div>
+          <div class="calc-grid">
+            <button class="calc-btn calc-fn" onclick="calcAppend('Math.sin(')">sin</button>
+            <button class="calc-btn calc-fn" onclick="calcAppend('Math.cos(')">cos</button>
+            <button class="calc-btn calc-fn" onclick="calcAppend('Math.tan(')">tan</button>
+            <button class="calc-btn calc-fn" onclick="calcClear()">C</button>
+            <button class="calc-btn calc-fn" onclick="calcBackspace()">⌫</button>
+
+            <button class="calc-btn calc-fn" onclick="calcAppend('Math.log10(')">log</button>
+            <button class="calc-btn calc-fn" onclick="calcAppend('Math.log(')">ln</button>
+            <button class="calc-btn calc-fn" onclick="calcAppend('Math.sqrt(')">√</button>
+            <button class="calc-btn calc-fn" onclick="calcAppend('(')">(</button>
+            <button class="calc-btn calc-fn" onclick="calcAppend(')')">)</button>
+
+            <button class="calc-btn calc-fn" onclick="calcAppend('Math.PI')">π</button>
+            <button class="calc-btn" onclick="calcAppend('7')">7</button>
+            <button class="calc-btn" onclick="calcAppend('8')">8</button>
+            <button class="calc-btn" onclick="calcAppend('9')">9</button>
+            <button class="calc-btn calc-op" onclick="calcAppend('/')">÷</button>
+
+            <button class="calc-btn calc-fn" onclick="calcAppend('Math.E')">e</button>
+            <button class="calc-btn" onclick="calcAppend('4')">4</button>
+            <button class="calc-btn" onclick="calcAppend('5')">5</button>
+            <button class="calc-btn" onclick="calcAppend('6')">6</button>
+            <button class="calc-btn calc-op" onclick="calcAppend('*')">×</button>
+
+            <button class="calc-btn calc-fn" onclick="calcAppend('**')">^</button>
+            <button class="calc-btn" onclick="calcAppend('1')">1</button>
+            <button class="calc-btn" onclick="calcAppend('2')">2</button>
+            <button class="calc-btn" onclick="calcAppend('3')">3</button>
+            <button class="calc-btn calc-op" onclick="calcAppend('-')">−</button>
+
+            <button class="calc-btn calc-fn" onclick="calcAppend('%')">%</button>
+            <button class="calc-btn" onclick="calcAppend('0')">0</button>
+            <button class="calc-btn" onclick="calcAppend('.')">.</button>
+            <button class="calc-btn calc-eq" onclick="calcEquals()">=</button>
+            <button class="calc-btn calc-op" onclick="calcAppend('+')">+</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="main">
@@ -974,8 +1089,13 @@
             </div>
             <button class="mini-action" onclick="exportAsImage()">🖼️ Ekspor Gambar</button>
             <button class="mini-action" onclick="sendToWhatsapp()">💬 Kirim ke WhatsApp</button>
+            <button class="mini-action" onclick="exportToIcs()">📆 Ekspor ke Kalender HP</button>
+            <button class="mini-action" id="tableViewBtn" onclick="toggleTableView()">📊 Tampilan Tabel</button>
+            <button class="mini-action" onclick="exportToIcs()">🗓️ Ekspor .ics</button>
+            <button class="mini-action" id="viewModeBtn" onclick="toggleViewMode()">🗂️ Tampilan Tabel</button>
           </div>
         </div>
+        <div id="piketBanner" class="piket-banner" style="display:none;"></div>
         <div id="weekGrid" class="week-grid" style="display:none;"></div>
         <div id="emptyState" class="empty-state">Pilih kelas di panel kiri untuk menampilkan jadwal.</div>
       </div>
@@ -1037,6 +1157,7 @@
       <button class="quick-btn" onclick="switchTab('legend')">Lihat Legenda</button>
       <button class="quick-btn" onclick="openQr()">📌 QR Kelas Ini</button>
       <button class="quick-btn" onclick="sendToWhatsapp()">💬 Kirim ke WhatsApp</button>
+      <button class="quick-btn" onclick="exportToIcs()">📆 Ekspor ke Kalender HP</button>
     </div>
   </div>
 
@@ -1340,6 +1461,14 @@ const tierToggle = document.getElementById('tierToggle');
 const classGrid = document.getElementById('classGrid');
 let currentTier = 'X';
 let selected = null;
+let tableViewMode = false;
+
+function toggleTableView(){
+  tableViewMode = !tableViewMode;
+  document.getElementById('tableViewBtn').classList.toggle('active', tableViewMode);
+  document.getElementById('tableViewBtn').textContent = tableViewMode ? '🎨 Tampilan Kartu' : '📊 Tampilan Tabel';
+  if(selected) renderSchedule(selected.tier, selected.num);
+}
 
 ['X','XI','XII'].forEach(tier=>{
   const b = document.createElement('button');
@@ -1416,6 +1545,19 @@ function renderSchedule(tier,num){
   const idx = colIndex(tier,num);
   document.getElementById('emptyState').style.display='none';
   const grid = document.getElementById('weekGrid');
+
+  if(viewMode === 'table'){
+    let totalSessions = 0;
+    Object.values(schedule).forEach(items => items.forEach(item => { if(!item.b) totalSessions++; }));
+    renderScheduleAsTable(idx);
+    document.getElementById('infoSessions').textContent = totalSessions;
+    applyDayFilter();
+    updateLiveStatus();
+    renderStats();
+    checkPiketToday();
+    return;
+  }
+
   grid.style.display='grid';
   grid.innerHTML='';
   let totalSessions=0;
@@ -1437,29 +1579,45 @@ function renderSchedule(tier,num){
       card.style.transitionDelay = (i*0.04)+'s';
       i++;
       if(item.b){
-        card.className='card brk';
-        card.innerHTML = `<div class="time">${item.t}</div><div>${item.l}</div>`;
+        card.className = tableViewMode ? 'card brk table-row' : 'card brk';
+        card.innerHTML = tableViewMode
+          ? `<span class="tr-time">${item.t}</span><span class="tr-subj" style="color:var(--muted);font-weight:600;">${item.l}</span>`
+          : `<div class="time">${item.t}</div><div>${item.l}</div>`;
       } else {
         totalSessions++;
         const code = item.c[idx];
         const info = resolveCode(code);
-        card.className='card';
-        card.style.background = info.color.bg;
-        card.style.color = info.color.fg;
-        card.style.border = `1px solid ${info.color.fg}55`;
         card.dataset.subj = (info.name+' '+info.guru).toLowerCase();
         card.dataset.key = day+'|'+item.t;
 
         const noteKey = `${tier}-${num}|${day}|${item.t}`;
         const noteText = getNotes()[noteKey];
         const safeSubj = (info.name||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+        const noteBtnHtml = `<button class="note-btn${noteText?' has-note':''}" title="Catatan pribadi" onclick="event.stopPropagation();openNoteModal('${noteKey}','${safeSubj}')">${noteText?'📌':'🗒️'}</button>`;
 
-        card.innerHTML = `
-          <button class="note-btn${noteText?' has-note':''}" title="Catatan pribadi" onclick="event.stopPropagation();openNoteModal('${noteKey}','${safeSubj}')">${noteText?'📌':'🗒️'}</button>
-          <div class="time">${item.t}</div>
-          <div class="subj">${info.name||'—'}</div>
-          <div class="who">${info.guru||''}</div>
-          ${noteText ? `<div class="note-indicator">📝 ${noteText}</div>` : ''}`;
+        if(tableViewMode){
+          card.className = 'card table-row';
+          card.style.background = '';
+          card.style.color = '';
+          card.style.border = '';
+          card.innerHTML = `
+            ${noteBtnHtml}
+            <span class="tr-time">${item.t}</span>
+            <span class="tr-subj" style="color:${info.color.fg}">${info.name||'—'}</span>
+            <span class="tr-guru">${info.guru||''}</span>
+            ${noteText ? `<div class="note-indicator">📝 ${noteText}</div>` : ''}`;
+        } else {
+          card.className='card';
+          card.style.background = info.color.bg;
+          card.style.color = info.color.fg;
+          card.style.border = `1px solid ${info.color.fg}55`;
+          card.innerHTML = `
+            ${noteBtnHtml}
+            <div class="time">${item.t}</div>
+            <div class="subj">${info.name||'—'}</div>
+            <div class="who">${info.guru||''}</div>
+            ${noteText ? `<div class="note-indicator">📝 ${noteText}</div>` : ''}`;
+        }
       }
       body.appendChild(card);
     });
@@ -1475,6 +1633,7 @@ function renderSchedule(tier,num){
   applyDayFilter();
   updateLiveStatus();
   renderStats();
+  checkPiketToday();
 
   // Safety net: if scroll-based reveal doesn't fire (some embedded viewers
   // don't report intersection correctly), force cards visible anyway.
@@ -1564,6 +1723,30 @@ function parseTimeRange(t){
 }
 
 /* ---------- LIVE STATUS / COUNTDOWN ---------- */
+function checkPiketReminder(){
+  if(localStorage.getItem('jadwal_notif') !== '1') return;
+  if(!('Notification' in window) || Notification.permission !== 'granted') return;
+  if(!selected || selected.tier !== 'X') return;
+  const isSchoolDay = ['Senin','Selasa','Rabu','Kamis','Jumat'].includes(todayName);
+  if(!isSchoolDay) return;
+
+  const profile = getProfile();
+  if(!profile) return;
+
+  const label = `${selected.tier}-${selected.num}`;
+  const names = getPiketForClass(label)[todayName] || [];
+  const myName = profile.nama.trim().toLowerCase();
+  const isMyTurn = names.some(n => n.trim().toLowerCase() === myName);
+  if(!isMyTurn) return;
+
+  const notifiedKey = 'jadwal_piket_notified_' + label + '_' + new Date().toDateString();
+  if(localStorage.getItem(notifiedKey)) return;
+  localStorage.setItem(notifiedKey, '1');
+  new Notification('🧹 Piket hari ini!', {
+    body: `Kamu ${profile.nama} kebagian piket hari ini di kelas ${label}. Jangan lupa ya!`
+  });
+}
+
 function updateLiveStatus(){
   const pill = document.getElementById('liveStatus');
   document.querySelectorAll('.card.live-now').forEach(c=>{
@@ -1571,6 +1754,8 @@ function updateLiveStatus(){
     const badge = c.querySelector('.live-badge');
     if(badge) badge.remove();
   });
+
+  checkPiketReminder();
 
   if(!selected){ pill.style.display='none'; return; }
 
@@ -1901,7 +2086,7 @@ Object.keys(mapelNames).forEach(code=>{
 
 /* ---------- SIDEBAR: NAV SWITCHING ---------- */
 function switchSidePanel(name){
-  ['kelas','guru','settings','tugas','ruang'].forEach(p=>{
+  ['kelas','guru','settings','tugas','ruang','kalkulator'].forEach(p=>{
     const panel = document.getElementById('sidePanel-'+p);
     if(p===name){
       panel.style.display = 'block';
@@ -2333,11 +2518,16 @@ function getPiketForClass(label){
 function renderPiketList(label){
   const roster = getPiketForClass(label);
   const isSchoolDay = ['Senin','Selasa','Rabu','Kamis','Jumat'].includes(todayName);
+  const profile = getProfile();
+  const myName = profile ? profile.nama.trim().toLowerCase() : null;
   return Object.keys(roster).map(day=>{
     const isToday = isSchoolDay && day === todayName;
     const names = roster[day];
     const namesHtml = names.length
-      ? names.map(n=>`<span class="piket-name">${n}</span>`).join('')
+      ? names.map(n=>{
+          const isMe = myName && n.trim().toLowerCase() === myName;
+          return `<span class="piket-name${isMe?' me':''}">${isMe?'⭐ ':''}${n}</span>`;
+        }).join('')
       : `<span class="piket-empty-name">Belum diisi</span>`;
     return `<div class="piket-day-row${isToday?' today':''}">
       <div class="piket-day-label">${day}${isToday?' <span class="piket-today-badge">🔥 Hari Ini</span>':''}</div>
@@ -2567,6 +2757,181 @@ function renderCalSelectedSchedule(){
   box.innerHTML = `<div class="cal-selected-title">${dateLabel} — Kelas ${selected.tier}-${selected.num}</div>${rows}`;
 }
 
+/* ---------- EXPORT TO PHONE CALENDAR (.ics) ---------- */
+const ICS_DAY_CODE = {Senin:'MO',Selasa:'TU',Rabu:'WE',Kamis:'TH',Jumat:'FR'};
+const ICS_JS_DOW = {Senin:1,Selasa:2,Rabu:3,Kamis:4,Jumat:5};
+
+function nextDateForDow(targetDow){
+  const d = new Date();
+  const diff = (targetDow - d.getDay() + 7) % 7;
+  d.setDate(d.getDate() + diff);
+  return d;
+}
+function icsDateTime(dateObj, hh, mm){
+  return `${dateObj.getFullYear()}${pad2(dateObj.getMonth()+1)}${pad2(dateObj.getDate())}T${pad2(hh)}${pad2(mm)}00`;
+}
+function icsEscape(s){
+  return String(s).replace(/[\\;,]/g, m => '\\'+m).replace(/\n/g,'\\n');
+}
+
+function exportToIcs(){
+  if(!selected){ alert('Pilih kelas dulu sebelum ekspor ke kalender.'); return; }
+  const idx = colIndex(selected.tier, selected.num);
+  let ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//JadwalKelas//ID\r\nCALSCALE:GREGORIAN\r\n';
+
+  Object.keys(schedule).forEach(day=>{
+    const dow = ICS_JS_DOW[day];
+    schedule[day].forEach(item=>{
+      if(item.b) return; // breaks aren't useful as calendar events
+      const info = resolveCode(item.c[idx]);
+      const {start,end} = parseTimeRange(item.t);
+      const baseDate = nextDateForDow(dow);
+      const dtStart = icsDateTime(baseDate, Math.floor(start/60), start%60);
+      const dtEnd = icsDateTime(baseDate, Math.floor(end/60), end%60);
+      const uid = `${selected.tier}${selected.num}-${day}-${start}@jadwalkelas`.replace(/\s+/g,'');
+      ics += 'BEGIN:VEVENT\r\n';
+      ics += `UID:${uid}\r\n`;
+      ics += `DTSTART:${dtStart}\r\n`;
+      ics += `DTEND:${dtEnd}\r\n`;
+      ics += `RRULE:FREQ=WEEKLY;BYDAY=${ICS_DAY_CODE[day]}\r\n`;
+      ics += `SUMMARY:${icsEscape(info.name)}\r\n`;
+      ics += `DESCRIPTION:${icsEscape(info.guru||'')}\r\n`;
+      ics += 'END:VEVENT\r\n';
+    });
+  });
+
+  ics += 'END:VCALENDAR\r\n';
+  const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `Jadwal-${selected.tier}-${selected.num}.ics`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  alert('File .ics berhasil dibuat. Buka file itu dari Downloads buat impor ke Kalender Google/HP kamu — jadwalnya berulang tiap minggu otomatis.');
+}
+
+/* ---------- PIKET-TODAY CHECK ---------- */
+function checkPiketToday(){
+  const banner = document.getElementById('piketBanner');
+  if(!banner) return;
+  const profile = getProfile();
+  const isSchoolDay = ['Senin','Selasa','Rabu','Kamis','Jumat'].includes(todayName);
+
+  if(!profile || !selected || !isSchoolDay){
+    banner.style.display = 'none';
+    return;
+  }
+  const label = `${selected.tier}-${selected.num}`;
+  const roster = piketData[label];
+  const namesToday = (roster && roster[todayName]) || [];
+  const isOnDuty = namesToday.some(n => n.trim().toLowerCase() === profile.nama.trim().toLowerCase());
+
+  if(!isOnDuty){
+    banner.style.display = 'none';
+    return;
+  }
+
+  banner.style.display = 'flex';
+  banner.innerHTML = `🧹 <span>Hari ini giliran piket kamu, <b>${profile.nama}</b>!</span>`;
+
+  const notifKey = 'jadwal_piket_notified_' + new Date().toDateString();
+  if(localStorage.getItem('jadwal_notif')==='1' && 'Notification' in window && Notification.permission==='granted' && !sessionStorage.getItem(notifKey)){
+    new Notification('Piket hari ini!', { body:`Halo ${profile.nama}, hari ini giliran kamu piket kelas ${label}.` });
+    sessionStorage.setItem(notifKey, '1');
+  }
+}
+
+/* ---------- VIEW MODE: KARTU / TABEL ---------- */
+let viewMode = localStorage.getItem('jadwal_viewMode') || 'card';
+
+function toggleViewMode(){
+  viewMode = viewMode === 'card' ? 'table' : 'card';
+  localStorage.setItem('jadwal_viewMode', viewMode);
+  document.getElementById('viewModeBtn').textContent = viewMode === 'card' ? '🗂️ Tampilan Tabel' : '🎴 Tampilan Kartu';
+  if(selected) renderSchedule(selected.tier, selected.num);
+}
+
+function renderScheduleAsTable(idx){
+  const grid = document.getElementById('weekGrid');
+  grid.style.display = 'block';
+  grid.style.gridTemplateColumns = '';
+  grid.style.maxWidth = '';
+  grid.innerHTML = '';
+
+  const days = selectedDays.size ? Object.keys(schedule).filter(d=>selectedDays.has(d)) : Object.keys(schedule);
+  const hideBreaks = document.getElementById('toggleHideBreaks') && document.getElementById('toggleHideBreaks').checked;
+  const showCodes = !document.getElementById('toggleShowCodes') || document.getElementById('toggleShowCodes').checked;
+
+  const table = document.createElement('table');
+  table.className = 'sched-table';
+  table.innerHTML = `<thead><tr><th>Waktu</th><th>Mapel</th><th>Guru</th></tr></thead>`;
+  const tbody = document.createElement('tbody');
+
+  days.forEach(day=>{
+    const dayRow = document.createElement('tr');
+    dayRow.className = 'day-header-row';
+    dayRow.innerHTML = `<td colspan="3">${day}${day===todayName?' · Hari ini':''}</td>`;
+    tbody.appendChild(dayRow);
+
+    schedule[day].forEach(item=>{
+      if(item.b){
+        if(hideBreaks) return;
+        const row = document.createElement('tr');
+        row.className = 'brk-row';
+        row.innerHTML = `<td>${item.t}</td><td colspan="2">${item.l}</td>`;
+        tbody.appendChild(row);
+      } else {
+        const info = resolveCode(item.c[idx]);
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${item.t}</td>
+          <td class="st-subj">${info.name||'—'}${showCodes && info.code ? ` <span class="code-tag">${info.code}</span>` : ''}</td>
+          <td class="st-guru">${info.guru||''}</td>`;
+        tbody.appendChild(row);
+      }
+    });
+  });
+
+  table.appendChild(tbody);
+  grid.appendChild(table);
+}
+
+/* ---------- KALKULATOR SAINS ---------- */
+let calcExpr = '';
+
+function calcAppend(token){
+  calcExpr += token;
+  document.getElementById('calcDisplay').textContent = calcExpr || '0';
+}
+function calcClear(){
+  calcExpr = '';
+  document.getElementById('calcDisplay').textContent = '0';
+}
+function calcBackspace(){
+  // Remove the last logical token (handles multi-char function calls like
+  // "Math.sin(" as one unit) rather than just one character.
+  const match = calcExpr.match(/(Math\.\w+\(|\*\*|.)$/);
+  if(match) calcExpr = calcExpr.slice(0, calcExpr.length - match[0].length);
+  document.getElementById('calcDisplay').textContent = calcExpr || '0';
+}
+function calcEquals(){
+  if(!calcExpr){ return; }
+  try{
+    // Only allow digits, math operators, parentheses, dot, %, and the
+    // specific Math.* tokens the buttons themselves insert — never
+    // evaluate arbitrary typed input since this uses Function().
+    const safe = /^[0-9+\-*/().%\s]|Math\.(sin|cos|tan|log10|log|sqrt|PI|E)/;
+    const stripped = calcExpr.replace(/Math\.(sin|cos|tan|log10|log|sqrt|PI|E)/g, '');
+    if(!/^[0-9+\-*/().%\s]*$/.test(stripped)) throw new Error('invalid');
+    const result = Function('"use strict";return ('+calcExpr+')')();
+    if(typeof result !== 'number' || !isFinite(result)) throw new Error('invalid');
+    calcExpr = String(Math.round(result*1e10)/1e10);
+    document.getElementById('calcDisplay').textContent = calcExpr;
+  } catch(e){
+    document.getElementById('calcDisplay').textContent = 'Error';
+    calcExpr = '';
+  }
+}
+
 function initApp(){
   // Restore the class FIRST and in its own try/catch, so nothing else in
   // this function (settings checkboxes, history chips, etc.) can ever
@@ -2604,6 +2969,7 @@ function initApp(){
     document.getElementById('toggleNotif').checked =
       (localStorage.getItem('jadwal_notif')==='1' && 'Notification' in window && Notification.permission==='granted');
   }catch(e){ console.error(e); }
+  try{ document.getElementById('viewModeBtn').textContent = viewMode === 'card' ? '🗂️ Tampilan Tabel' : '🎴 Tampilan Kartu'; }catch(e){ console.error(e); }
   try{ renderHistory(); }catch(e){ console.error(e); }
 }
 initApp();
