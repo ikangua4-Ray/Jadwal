@@ -2896,39 +2896,53 @@ function renderScheduleAsTable(idx){
 }
 
 /* ---------- KALKULATOR SAINS ---------- */
-let calcExpr = '';
+let calcTokens = []; // {eval, disp} pairs, in order
 
+const CALC_DISPLAY_MAP = {
+  'Math.sin(': 'sin(',
+  'Math.cos(': 'cos(',
+  'Math.tan(': 'tan(',
+  'Math.log10(': 'log(',
+  'Math.log(': 'ln(',
+  'Math.sqrt(': '√(',
+  'Math.PI': 'π',
+  'Math.E': 'e',
+  '**': '^'
+};
+
+function calcUpdateDisplay(){
+  const disp = calcTokens.map(t => t.disp).join('');
+  document.getElementById('calcDisplay').textContent = disp || '0';
+}
 function calcAppend(token){
-  calcExpr += token;
-  document.getElementById('calcDisplay').textContent = calcExpr || '0';
+  calcTokens.push({ eval: token, disp: CALC_DISPLAY_MAP[token] || token });
+  calcUpdateDisplay();
 }
 function calcClear(){
-  calcExpr = '';
-  document.getElementById('calcDisplay').textContent = '0';
+  calcTokens = [];
+  calcUpdateDisplay();
 }
 function calcBackspace(){
-  // Remove the last logical token (handles multi-char function calls like
-  // "Math.sin(" as one unit) rather than just one character.
-  const match = calcExpr.match(/(Math\.\w+\(|\*\*|.)$/);
-  if(match) calcExpr = calcExpr.slice(0, calcExpr.length - match[0].length);
-  document.getElementById('calcDisplay').textContent = calcExpr || '0';
+  calcTokens.pop();
+  calcUpdateDisplay();
 }
 function calcEquals(){
-  if(!calcExpr){ return; }
+  const expr = calcTokens.map(t => t.eval).join('');
+  if(!expr){ return; }
   try{
     // Only allow digits, math operators, parentheses, dot, %, and the
     // specific Math.* tokens the buttons themselves insert — never
     // evaluate arbitrary typed input since this uses Function().
-    const safe = /^[0-9+\-*/().%\s]|Math\.(sin|cos|tan|log10|log|sqrt|PI|E)/;
-    const stripped = calcExpr.replace(/Math\.(sin|cos|tan|log10|log|sqrt|PI|E)/g, '');
+    const stripped = expr.replace(/Math\.(sin|cos|tan|log10|log|sqrt|PI|E)/g, '');
     if(!/^[0-9+\-*/().%\s]*$/.test(stripped)) throw new Error('invalid');
-    const result = Function('"use strict";return ('+calcExpr+')')();
+    const result = Function('"use strict";return ('+expr+')')();
     if(typeof result !== 'number' || !isFinite(result)) throw new Error('invalid');
-    calcExpr = String(Math.round(result*1e10)/1e10);
-    document.getElementById('calcDisplay').textContent = calcExpr;
+    const resultStr = String(Math.round(result*1e10)/1e10);
+    calcTokens = [{ eval: resultStr, disp: resultStr }];
+    calcUpdateDisplay();
   } catch(e){
     document.getElementById('calcDisplay').textContent = 'Error';
-    calcExpr = '';
+    calcTokens = [];
   }
 }
 
